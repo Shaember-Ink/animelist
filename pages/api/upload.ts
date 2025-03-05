@@ -15,29 +15,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
+    const uploadDir = path.join(process.cwd(), 'public/uploads');
+    
+    // Создаем директорию для загрузок, если она не существует
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
     const form = formidable({
-      uploadDir: path.join(process.cwd(), 'public/uploads'),
+      uploadDir,
       keepExtensions: true,
       maxFileSize: 5 * 1024 * 1024, // 5MB
     });
 
-    // Создаем директорию для загрузок, если она не существует
-    if (!fs.existsSync(form.uploadDir)) {
-      fs.mkdirSync(form.uploadDir, { recursive: true });
-    }
-
-    const { fields, files } = await new Promise((resolve, reject) => {
-      form.parse(req, (err, fields, files) => {
-        if (err) reject(err);
-        resolve({ fields, files });
-      });
-    });
-
-    const file = files.file as formidable.File;
-    if (!file) {
+    const [fields, files] = await form.parse(req);
+    const fileArray = files.file;
+    
+    if (!fileArray || fileArray.length === 0) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
+    const file = fileArray[0];
+    
     // Генерируем путь к файлу относительно /public
     const relativePath = path.relative(
       path.join(process.cwd(), 'public'),
