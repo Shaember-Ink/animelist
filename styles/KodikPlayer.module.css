@@ -1,0 +1,148 @@
+.playerContainer {
+  position: relative;
+  width: 100%;
+  background-color: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 16/9;
+}
+
+.playerWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.7) 0%,
+    transparent 20%,
+    transparent 80%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.topControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  color: #fff;
+  font-size: 1.2rem;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.bottomControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.leftControls,
+.rightControls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.controlButton {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.controlButton:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.controlButton svg {
+  width: 20px;
+  height: 20px;
+}
+
+.settingsContainer {
+  position: relative;
+}
+
+.settingsMenu {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  background-color: rgba(28, 28, 28, 0.9);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  min-width: 150px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.qualityOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.qualityButton {
+  background: none;
+  border: none;
+  color: #fff;
+  padding: 8px 16px;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.qualityButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.qualityButton.active {
+  background-color: #2196f3;
+}
+
+@media (max-width: 768px) {
+  .controls {
+    padding: 10px;
+  }
+
+  .title {
+    font-size: 1rem;
+  }
+
+  .controlButton {
+    width: 32px;
+    height: 32px;
+  }
+
+  .controlButton svg {
+    width: 16px;
+    height: 16px;
+  }
+} 
