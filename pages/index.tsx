@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import type { NextPage } from 'next';
+import type { NextPage, GetStaticProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import Layout from '../components/Layout';
+import HeroBanner from '../components/HeroBanner';
 import styles from '../styles/Home.module.css';
-import heroStyles from '../styles/Hero.module.css';
-import { FaFire, FaCalendarAlt, FaStar, FaChevronRight, FaPlay, FaBook, FaNewspaper, FaUsers } from 'react-icons/fa';
-import cardStyles from '../styles/Card.module.css';
+import CardStyles from '../styles/Card.module.css';
+import { FaFire, FaClapperboard, FaStar } from 'react-icons/fa6';
+import { fetchWithRetry, delay } from '../utils/api';
 
 interface Anime {
   mal_id: number;
@@ -20,170 +20,211 @@ interface Anime {
   members: number;
   type: string;
   episodes: number;
+  status: string;
+  synopsis: string;
+  year: number;
 }
 
-interface Section {
-  title: string;
-  icon: JSX.Element;
-  endpoint: string;
+interface HomePageProps {
+  trendingAnime: Anime[];
+  newAnime: Anime[];
+  upcomingAnime: Anime[];
+  error?: string | null;
 }
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
+  try {
+    const trendingData = await fetchWithRetry('https://api.jikan.moe/v4/top/anime');
+    await delay(1000);
+    const newData = await fetchWithRetry('https://api.jikan.moe/v4/seasons/now');
+    await delay(1000);
+    const upcomingData = await fetchWithRetry('https://api.jikan.moe/v4/seasons/upcoming');
 
-const fetchWithRetry = async (url: string, retries = 3) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      if (i === retries - 1) throw error;
-      await delay(1000); // Ждем секунду перед повторной попыткой
-    }
+    return {
+      props: {
+        trendingAnime: trendingData?.data?.slice(0, 15) || [],
+        newAnime: newData?.data?.slice(0, 15) || [],
+        upcomingAnime: upcomingData?.data?.slice(0, 15) || [],
+        error: null,
+      },
+      revalidate: 3600,
+    };
+  } catch (err) {
+    console.error('Error fetching home data in getStaticProps:', err);
+    return {
+      props: {
+        trendingAnime: [],
+        newAnime: [],
+        upcomingAnime: [],
+        error: 'Произошла ошибка загрузки данных.',
+      },
+      revalidate: 60,
+    };
   }
 };
 
-const Home: NextPage = () => {
-  const [trendingAnime, setTrendingAnime] = useState<Anime[]>([]);
-  const [seasonalAnime, setSeasonalAnime] = useState<Anime[]>([]);
-  const [upcomingAnime, setUpcomingAnime] = useState<Anime[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const Home: NextPage<HomePageProps> = ({ trendingAnime, newAnime, upcomingAnime, error }) => {
+  const heroAnimeList = trendingAnime?.slice(0, 5) || [];
+  const popularList = trendingAnime?.slice(1) || [];
 
-  const sections: Section[] = [
-    { title: 'Популярное сейчас', icon: <FaFire />, endpoint: 'top/anime' },
-    { title: 'Сезонное аниме', icon: <FaCalendarAlt />, endpoint: 'seasons/now' },
-    { title: 'Скоро выйдет', icon: <FaStar />, endpoint: 'seasons/upcoming' }
-  ];
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    el.dataset.isDown = 'true';
+    el.dataset.isDragging = 'false';
+    el.dataset.startX = (e.pageX - el.offsetLeft).toString();
+    el.dataset.scrollLeft = el.scrollLeft.toString();
+  };
 
-  useEffect(() => {
-    const fetchAnimeData = async () => {
-      setLoading(true);
-      setError(null);
+  const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    el.dataset.isDown = 'false';
+  };
 
-      try {
-        // Делаем запросы последовательно с задержкой
-        const trendingData = await fetchWithRetry('https://api.jikan.moe/v4/top/anime');
-        await delay(1000);
-        const seasonalData = await fetchWithRetry('https://api.jikan.moe/v4/seasons/now');
-        await delay(1000);
-        const upcomingData = await fetchWithRetry('https://api.jikan.moe/v4/seasons/upcoming');
+  const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    el.dataset.isDown = 'false';
+  };
 
-        setTrendingAnime(trendingData.data.slice(0, 6));
-        setSeasonalAnime(seasonalData.data.slice(0, 6));
-        setUpcomingAnime(upcomingData.data.slice(0, 6));
-      } catch (err) {
-        console.error('Error fetching anime data:', err);
-        setError('Произошла ошибка при загрузке данных. Пожалуйста, подождите немного и обновите страницу.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    if (el.dataset.isDown !== 'true') return;
+    e.preventDefault();
+    const x = e.pageX - el.offsetLeft;
+    const startX = parseFloat(el.dataset.startX || '0');
+    const scrollLeft = parseFloat(el.dataset.scrollLeft || '0');
+    const walk = (x - startX) * 2;
+    el.scrollLeft = scrollLeft - walk;
+    if (Math.abs(walk) > 5) {
+      el.dataset.isDragging = 'true';
+    }
+  };
 
-    fetchAnimeData();
-  }, []);
+  const handleClickCapture = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    if (el.dataset.isDragging === 'true') {
+      e.preventDefault();
+      e.stopPropagation();
+      el.dataset.isDragging = 'false';
+    }
+  };
+
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    if (e.deltaY !== 0) {
+      el.scrollLeft += e.deltaY;
+    }
+  };
 
   const renderAnimeCard = (anime: Anime) => (
-    <Link href={`/anime/${anime.mal_id}`} key={anime.mal_id} className={cardStyles.card}>
-      <div className={cardStyles.imageWrapper}>
+    <Link href={`/anime/${anime.mal_id}`} key={anime.mal_id} className={CardStyles.card}>
+      <div className={CardStyles.imageWrapper}>
         <img
           src={anime.images.jpg.large_image_url}
           alt={anime.title}
-          className={cardStyles.image}
+          className={CardStyles.image}
         />
-        <div className={cardStyles.overlay}>
-          <div className={cardStyles.stats}>
-            <span className={cardStyles.score}>
+        <div className={CardStyles.overlay}>
+          <div className={CardStyles.stats}>
+            <span className={CardStyles.score}>
               <FaStar /> {anime.score || '??'}
-            </span>
-            <span className={cardStyles.episodes}>
-              {anime.episodes ? `${anime.episodes} эп.` : 'TBA'}
             </span>
           </div>
         </div>
       </div>
-      <div className={cardStyles.content}>
-        <h3 className={cardStyles.title}>{anime.title}</h3>
-        <div className={cardStyles.info}>
-          <span className={cardStyles.type}>{anime.type}</span>
-          <span className={cardStyles.members}>{anime.members.toLocaleString()} участников</span>
+      <div className={CardStyles.content}>
+        <h3 className={CardStyles.title}>{anime.title}</h3>
+        <div className={CardStyles.info}>
+          <span className={CardStyles.type}>{anime.year || 'TBA'}</span>
         </div>
       </div>
     </Link>
   );
 
-  if (loading) {
-    return (
-      <Layout>
-        <div className={styles.loading}>
-          <div className={styles.spinner}></div>
-          <p>Загрузка аниме...</p>
-        </div>
-      </Layout>
-    );
-  }
-
-  if (error) {
-    return (
-      <Layout>
-        <div className={styles.error}>{error}</div>
-      </Layout>
-    );
-  }
-
   return (
     <Layout>
       <Head>
-        <title>AnimeList - Главная</title>
-        <meta name="description" content="Исследуйте мир аниме и манги" />
+        <title>AnimeList - Watch Anime Online</title>
+        <meta name="description" content="Watch the best anime online with a sleek interface" />
       </Head>
 
-      <div className={`${heroStyles.hero} ${styles.mainHero}`}>
-        <div className={heroStyles.heroContent}>
-          <h1 className={heroStyles.heroTitle}>
-            Добро пожаловать в мир аниме
-          </h1>
-          <p className={heroStyles.heroSubtitle}>
-            Исследуйте тысячи аниме, следите за новинками и делитесь впечатлениями
-          </p>
-          <div className={styles.heroButtons}>
-            <Link href="/anime" className={styles.primaryButton}>
-              <FaPlay /> Смотреть аниме
-            </Link>
-            <Link href="/manga" className={styles.secondaryButton}>
-              <FaBook /> Читать мангу
-            </Link>
-          </div>
-        </div>
-      </div>
+      {error && <div className={styles.error}>{error}</div>}
+
+      <HeroBanner animeList={heroAnimeList} />
 
       <div className={styles.container}>
-        <div className={styles.features}>
-          <div className={styles.feature}>
-            <div className={styles.featureIcon}>
-              <FaPlay />
+        {/* Trends Now Section */}
+        {popularList.length > 0 && (
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>
+                <FaFire className={styles.sectionIcon} /> Trends Now
+              </h2>
             </div>
-            <h2>Огромная коллекция</h2>
-            <p>Тысячи аниме и манги в одном месте</p>
-          </div>
-          <div className={styles.feature}>
-            <div className={styles.featureIcon}>
-              <FaNewspaper />
+
+            <div className={styles.rowContainer}>
+              <div 
+                className={styles.row}
+                onMouseDown={handleMouseDown}
+                onMouseLeave={handleMouseLeave}
+                onMouseUp={handleMouseUp}
+                onMouseMove={handleMouseMove}
+                onClickCapture={handleClickCapture}
+                onWheel={handleWheel}
+              >
+                {popularList.map(renderAnimeCard)}
+              </div>
             </div>
-            <h2>Свежие новости</h2>
-            <p>Будьте в курсе последних событий</p>
-          </div>
-          <div className={styles.feature}>
-            <div className={styles.featureIcon}>
-              <FaUsers />
+          </section>
+        )}
+
+        {/* Movies Section (Used for New Anime here) */}
+        {newAnime.length > 0 && (
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>
+                <FaClapperboard className={styles.sectionIcon} /> Latest Anime
+              </h2>
             </div>
-            <h2>Сообщество</h2>
-            <p>Обсуждайте и делитесь мнениями</p>
-          </div>
-        </div>
+
+            <div className={styles.rowContainer}>
+              <div 
+                className={styles.row}
+                onMouseDown={handleMouseDown}
+                onMouseLeave={handleMouseLeave}
+                onMouseUp={handleMouseUp}
+                onMouseMove={handleMouseMove}
+                onClickCapture={handleClickCapture}
+                onWheel={handleWheel}
+              >
+                {newAnime.map(renderAnimeCard)}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Upcoming Section */}
+        {upcomingAnime.length > 0 && (
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>
+                <FaStar className={styles.sectionIcon} /> Upcoming Drops
+              </h2>
+            </div>
+            <div className={styles.rowContainer}>
+              <div 
+                className={styles.row}
+                onMouseDown={handleMouseDown}
+                onMouseLeave={handleMouseLeave}
+                onMouseUp={handleMouseUp}
+                onMouseMove={handleMouseMove}
+                onClickCapture={handleClickCapture}
+                onWheel={handleWheel}
+              >
+                {upcomingAnime.map(renderAnimeCard)}
+              </div>
+            </div>
+          </section>
+        )}
       </div>
     </Layout>
   );

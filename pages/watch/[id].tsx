@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
+import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Layout from '../../components/Layout';
 import styles from '../../styles/Watch.module.css';
 import { FaList, FaBookmark, FaHeart, FaShare, FaCheck, FaCopy } from 'react-icons/fa';
+import { fetchWithRetry } from '../../utils/api';
 
 interface Episode {
   number: number;
@@ -16,62 +18,77 @@ interface AnimeDetails {
   shikimori_id: string;
 }
 
-export default function WatchAnime() {
+interface WatchAnimePageProps {
+  initialAnimeDetails: AnimeDetails | null;
+  error: string | null;
+}
+
+export const getServerSideProps: GetServerSideProps<WatchAnimePageProps> = async ({ params, res }) => {
+  res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=3600, stale-while-revalidate=86400'
+  );
+
+  const id = params?.id;
+
+  if (!id || typeof id !== 'string') {
+    return { notFound: true };
+  }
+
+  try {
+    const data = await fetchWithRetry(`https://api.jikan.moe/v4/anime/${id}`);
+    
+    if (!data || !data.data) {
+      throw new Error('Не удалось загрузить информацию об аниме');
+    }
+
+    const animeDetails: AnimeDetails = {
+      id: id,
+      title: data.data.title,
+      episodes: Array.from({ length: data.data.episodes || 1 }, (_, i) => ({
+        number: i + 1
+      })),
+      shikimori_id: data.data.mal_id.toString()
+    };
+
+    return {
+      props: {
+        initialAnimeDetails: animeDetails,
+        error: null,
+      },
+    };
+  } catch (err) {
+    console.error('Error fetching anime details in getServerSideProps:', err);
+    return {
+      props: {
+        initialAnimeDetails: null,
+        error: 'Произошла ошибка при загрузке данных',
+      },
+    };
+  }
+};
+
+export default function WatchAnime({ initialAnimeDetails, error }: WatchAnimePageProps) {
   const router = useRouter();
-  const { id } = router.query;
-  const [animeDetails, setAnimeDetails] = useState<AnimeDetails | null>(null);
   const [currentEpisode, setCurrentEpisode] = useState<number>(1);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [shareStatus, setShareStatus] = useState<'default' | 'copied' | 'shared'>('default');
-
-  useEffect(() => {
-    if (id) {
-      fetchAnimeDetails();
-    }
-  }, [id]);
-
-  const fetchAnimeDetails = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`https://api.jikan.moe/v4/anime/${id}`);
-      if (!response.ok) throw new Error('Не удалось загрузить информацию об аниме');
-      
-      const data = await response.json();
-      
-      setAnimeDetails({
-        id: id as string,
-        title: data.data.title,
-        episodes: Array.from({ length: data.data.episodes || 1 }, (_, i) => ({
-          number: i + 1
-        })),
-        shikimori_id: data.data.mal_id.toString()
-      });
-      
-      setLoading(false);
-    } catch (err) {
-      setError('Произошла ошибка при загрузке данных');
-      console.error('Error fetching anime details:', err);
-      setLoading(false);
-    }
-  };
 
   const handleEpisodeSelect = (episodeNumber: number) => {
     setCurrentEpisode(episodeNumber);
   };
 
   const handleShare = async () => {
-    const shareUrl = window.location.href;
-    const shareText = `Смотреть ${animeDetails?.title} - Эпизод ${currentEpisode}`;
+    const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+    const shareText = `Смотреть ${initialAnimeDetails?.title} - Эпизод ${currentEpisode}`;
 
     try {
-      if (navigator.share) {
+      if (typeof navigator !== 'undefined' && navigator.share) {
         await navigator.share({
           title: shareText,
           url: shareUrl
         });
         setShareStatus('shared');
-      } else {
+      } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
         await navigator.clipboard.writeText(shareUrl);
         setShareStatus('copied');
         setTimeout(() => setShareStatus('default'), 2000);
@@ -107,22 +124,11 @@ export default function WatchAnime() {
     }
   };
 
-  if (loading) {
-    return (
-      <Layout>
-        <div className={styles.loading}>
-          <div className={styles.spinner}></div>
-          <p>Загрузка...</p>
-        </div>
-      </Layout>
-    );
-  }
-
-  if (error) {
+  if (error || !initialAnimeDetails) {
     return (
       <Layout>
         <div className={styles.error}>
-          <p>{error}</p>
+          <p>{error || 'Аниме не найдено'}</p>
           <button onClick={() => router.back()} className={styles.backButton}>
             Вернуться назад
           </button>
@@ -134,15 +140,15 @@ export default function WatchAnime() {
   return (
     <Layout>
       <Head>
-        <title>{animeDetails?.title} - Смотреть онлайн - AnimeList</title>
-        <meta name="description" content={`Смотреть ${animeDetails?.title} онлайн бесплатно`} />
+        <title>{initialAnimeDetails.title} - Смотреть онлайн - AnimeList</title>
+        <meta name="description" content={`Смотреть ${initialAnimeDetails.title} онлайн бесплатно`} />
       </Head>
 
       <div className={styles.container}>
         <div className={styles.playerSection}>
           <div className={styles.videoWrapper}>
             <iframe
-              src={`https://kodik.info/find-player?shikimoriID=${animeDetails?.shikimori_id}&episode=${currentEpisode}`}
+              src={`https://kodik.info/find-player?shikimoriID=${initialAnimeDetails.shikimori_id}&episode=${currentEpisode}`}
               className={styles.videoPlayer}
               frameBorder="0"
               allowFullScreen
@@ -151,14 +157,7 @@ export default function WatchAnime() {
           </div>
 
           <div className={styles.controls}>
-            <button className={`${styles.actionButton} ${styles.listButton}`}>
-              <FaBookmark />
-              <span>Добавить в список</span>
-            </button>
-            <button className={`${styles.actionButton} ${styles.favoriteButton}`}>
-              <FaHeart />
-              <span>В избранное</span>
-            </button>
+
             <button 
               className={`${styles.actionButton} ${styles.shareButton} ${shareStatus !== 'default' ? styles.shared : ''}`}
               onClick={handleShare}
@@ -168,7 +167,7 @@ export default function WatchAnime() {
           </div>
 
           <div className={styles.episodeInfo}>
-            <h1 className={styles.title}>{animeDetails?.title}</h1>
+            <h1 className={styles.title}>{initialAnimeDetails.title}</h1>
             <p className={styles.episodeTitle}>
               Эпизод {currentEpisode}
             </p>
@@ -180,7 +179,7 @@ export default function WatchAnime() {
             <FaList /> Список эпизодов
           </h2>
           <div className={styles.episodesGrid}>
-            {animeDetails?.episodes.map((episode) => (
+            {initialAnimeDetails.episodes.map((episode) => (
               <button
                 key={episode.number}
                 onClick={() => handleEpisodeSelect(episode.number)}

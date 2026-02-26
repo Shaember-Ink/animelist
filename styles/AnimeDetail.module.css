@@ -65,13 +65,13 @@
 }
 
 .actionButton:not(.secondary) {
-  background: linear-gradient(45deg, #7e37e6, #9353f4);
+  background: var(--primary);
   color: white;
 }
 
 .actionButton:not(.secondary):hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(126, 55, 230, 0.3);
+  background: var(--primary-dark);
 }
 
 .actionButton.secondary {
@@ -136,7 +136,7 @@
 
 .statIcon {
   font-size: 24px;
-  color: #7e37e6;
+  color: var(--primary);
 }
 
 .statContent {
@@ -192,7 +192,7 @@
 
 .detailIcon {
   font-size: 20px;
-  color: #7e37e6;
+  color: var(--primary);
 }
 
 .detailLabel {
@@ -218,8 +218,8 @@
 
 .genre {
   padding: 8px 16px;
-  background: rgba(126, 55, 230, 0.2);
-  border: 1px solid rgba(126, 55, 230, 0.3);
+  background: rgba(229, 9, 20, 0.2);
+  border: 1px solid rgba(229, 9, 20, 0.3);
   border-radius: 20px;
   color: #fff;
   font-family: 'Montserrat', sans-serif;
@@ -229,9 +229,9 @@
 }
 
 .genre:hover {
-  background: rgba(126, 55, 230, 0.3);
+  background: rgba(229, 9, 20, 0.3);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(126, 55, 230, 0.2);
+  box-shadow: 0 4px 12px rgba(229, 9, 20, 0.2);
 }
 
 .synopsis {
@@ -310,8 +310,8 @@
 .spinner {
   width: 48px;
   height: 48px;
-  border: 3px solid rgba(126, 55, 230, 0.3);
-  border-top-color: #7e37e6;
+  border: 3px solid rgba(229, 9, 20, 0.3);
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -485,8 +485,8 @@
   width: fit-content;
   margin: 32px auto 0;
   padding: 12px 24px;
-  background: rgba(126, 55, 230, 0.2);
-  border: 1px solid rgba(126, 55, 230, 0.3);
+  background: rgba(229, 9, 20, 0.2);
+  border: 1px solid rgba(229, 9, 20, 0.3);
   border-radius: 24px;
   color: #fff;
   font-family: 'Montserrat', sans-serif;
@@ -497,14 +497,14 @@
 }
 
 .showMoreButton:hover {
-  background: rgba(126, 55, 230, 0.3);
+  background: rgba(229, 9, 20, 0.3);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(126, 55, 230, 0.2);
+  box-shadow: 0 4px 12px rgba(229, 9, 20, 0.2);
 }
 
 .sectionTitleIcon {
   font-size: 24px;
-  color: #7e37e6;
+  color: var(--primary);
 }
 
 @media (max-width: 768px) {
@@ -532,7 +532,7 @@
 }
 
 .sectionIcon {
-  color: #8b5cf6;
+  color: var(--primary);
 }
 
 /* Стили для секции авторов */

@@ -21,10 +21,6 @@ model User {
   // Отношения
   animeFavorites    Favorite[]
   animeWatchlist    Watchlist[]
-  mangaFavorites    MangaFavorite[]
-  mangaReadlist     MangaReadlist[]
-  ranobeFavorites   RanobeFavorite[]
-  ranobeReadlist    RanobeReadlist[]
 }
 
 model Anime {
@@ -41,39 +37,6 @@ model Anime {
   // Отношения
   favorites    Favorite[]
   watchlist    Watchlist[]
-}
-
-model Manga {
-  id            Int      @id @default(autoincrement())
-  title         String
-  originalTitle String?
-  image         String
-  chapters      Int?
-  status        String   // ongoing, completed, hiatus
-  type          String   // manga, manhwa, manhua
-  mangaDexId    String?  // ID в MangaDex API
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  // Отношения
-  favorites    MangaFavorite[]
-  readlist    MangaReadlist[]
-}
-
-model Ranobe {
-  id            Int      @id @default(autoincrement())
-  title         String
-  originalTitle String?
-  image         String
-  volumes       Int?
-  chapters      Int?
-  status        String   // ongoing, completed, hiatus
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  // Отношения
-  favorites    RanobeFavorite[]
-  readlist    RanobeReadlist[]
 }
 
 model Favorite {
@@ -105,63 +68,3 @@ model Watchlist {
 
   @@unique([userId, animeId])
 }
-
-model MangaFavorite {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  mangaId   Int
-  createdAt DateTime @default(now())
-
-  // Отношения
-  user      User     @relation(fields: [userId], references: [id])
-  manga     Manga    @relation(fields: [mangaId], references: [id])
-
-  @@unique([userId, mangaId])
-}
-
-model MangaReadlist {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  mangaId   Int
-  status    String   // reading, completed, planned, dropped
-  progress  Int      @default(0)
-  score     Int?     @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Отношения
-  user      User     @relation(fields: [userId], references: [id])
-  manga     Manga    @relation(fields: [mangaId], references: [id])
-
-  @@unique([userId, mangaId])
-}
-
-model RanobeFavorite {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  ranobeId  Int
-  createdAt DateTime @default(now())
-
-  // Отношения
-  user      User     @relation(fields: [userId], references: [id])
-  ranobe    Ranobe   @relation(fields: [ranobeId], references: [id])
-
-  @@unique([userId, ranobeId])
-}
-
-model RanobeReadlist {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  ranobeId  Int
-  status    String   // reading, completed, planned, dropped
-  progress  Int      @default(0)
-  score     Int?     @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Отношения
-  user      User     @relation(fields: [userId], references: [id])
-  ranobe    Ranobe   @relation(fields: [ranobeId], references: [id])
-
-  @@unique([userId, ranobeId])
-} 

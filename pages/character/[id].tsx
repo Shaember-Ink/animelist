@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Layout from '../../components/Layout';
 import styles from '../../styles/CharacterDetail.module.css';
 import { FaStar, FaHeart } from 'react-icons/fa';
+import { fetchWithRetry } from '../../utils/api';
 
 interface Character {
   mal_id: number;
@@ -29,18 +29,7 @@ interface Character {
     };
     role: string;
   }>;
-  mangaography: Array<{
-    manga: {
-      mal_id: number;
-      title: string;
-      images: {
-        jpg: {
-          image_url: string;
-        };
-      };
-    };
-    role: string;
-  }>;
+
   voice_actors: Array<{
     person: {
       mal_id: number;
@@ -55,63 +44,43 @@ interface Character {
   }>;
 }
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+interface CharacterDetailPageProps {
+  character: Character | null;
+  error: string | null;
+}
 
-const fetchWithRetry = async (url: string, retries = 3) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      if (i === retries - 1) throw error;
-      await delay(1000);
-    }
+export const getServerSideProps: GetServerSideProps<CharacterDetailPageProps> = async ({ params, res }) => {
+  res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=3600, stale-while-revalidate=86400'
+  );
+
+  const id = params?.id;
+
+  if (!id || typeof id !== 'string') {
+    return { notFound: true };
+  }
+
+  try {
+    const characterData = await fetchWithRetry(`https://api.jikan.moe/v4/characters/${id}/full`);
+    return {
+      props: {
+        character: characterData?.data || null,
+        error: null,
+      },
+    };
+  } catch (err) {
+    console.error('Error fetching character detail data in getServerSideProps:', err);
+    return {
+      props: {
+        character: null,
+        error: 'Произошла ошибка при загрузке данных о персонаже.',
+      },
+    };
   }
 };
 
-export default function CharacterDetailPage() {
-  const router = useRouter();
-  const { id } = router.query;
-  const [character, setCharacter] = useState<Character | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchCharacterData = async () => {
-      if (!id) return;
-
-      setLoading(true);
-      setError(null);
-
-      try {
-        const characterData = await fetchWithRetry(`https://api.jikan.moe/v4/characters/${id}/full`);
-        setCharacter(characterData.data);
-      } catch (err) {
-        console.error('Error fetching character data:', err);
-        setError('Произошла ошибка при загрузке данных. Пожалуйста, подождите немного и обновите страницу.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCharacterData();
-  }, [id]);
-
-  if (loading) {
-    return (
-      <Layout>
-        <div className={styles.loading}>
-          <div className={styles.spinner}></div>
-          <p>Загрузка информации о персонаже...</p>
-        </div>
-      </Layout>
-    );
-  }
-
+export default function CharacterDetailPage({ character, error }: CharacterDetailPageProps) {
   if (error || !character) {
     return (
       <Layout>
@@ -161,9 +130,7 @@ export default function CharacterDetailPage() {
               </div>
             </div>
 
-            <button className={styles.favoriteButton}>
-              <FaHeart /> Добавить в избранное
-            </button>
+
           </div>
         </div>
 
@@ -178,8 +145,8 @@ export default function CharacterDetailPage() {
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>Появления в аниме</h3>
             <div className={styles.mediaGrid}>
-              {character.animeography.map((entry) => (
-                <div key={entry.anime.mal_id} className={styles.mediaCard}>
+              {character.animeography.map((entry, index) => (
+                <div key={`${entry.anime.mal_id}-${index}`} className={styles.mediaCard}>
                   <img
                     src={entry.anime.images.jpg.image_url}
                     alt={entry.anime.title}
@@ -195,33 +162,12 @@ export default function CharacterDetailPage() {
           </div>
         )}
 
-        {character.mangaography && character.mangaography.length > 0 && (
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Появления в манге</h3>
-            <div className={styles.mediaGrid}>
-              {character.mangaography.map((entry) => (
-                <div key={entry.manga.mal_id} className={styles.mediaCard}>
-                  <img
-                    src={entry.manga.images.jpg.image_url}
-                    alt={entry.manga.title}
-                    className={styles.mediaImage}
-                  />
-                  <div className={styles.mediaInfo}>
-                    <h4 className={styles.mediaTitle}>{entry.manga.title}</h4>
-                    <span className={styles.role}>{entry.role}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {character.voice_actors && character.voice_actors.length > 0 && (
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>Сэйю</h3>
             <div className={styles.voiceActorsGrid}>
-              {character.voice_actors.map((va) => (
-                <div key={va.person.mal_id} className={styles.vaCard}>
+              {character.voice_actors.map((va, index) => (
+                <div key={`${va.person.mal_id}-${index}`} className={styles.vaCard}>
                   <img
                     src={va.person.images.jpg.image_url}
                     alt={va.person.name}

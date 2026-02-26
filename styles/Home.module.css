@@ -1,128 +1,116 @@
 .container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 0;
 }
 
-.mainHero {
-  min-height: 500px;
+.section {
+  padding: 1rem 4% 3rem;
+  position: relative;
+  z-index: 5;
+}
+
+.sectionHeader {
   display: flex;
   align-items: center;
-  background-image: linear-gradient(45deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), url('/images/hero-bg.jpg');
-  background-size: cover;
-  background-position: center;
-  margin: 0 0 3rem;
-  border-radius: 0;
+  justify-content: flex-start;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
 }
 
-.heroButtons {
+.sectionTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: var(--text);
+  margin: 0;
+}
+
+.sectionIcon {
+  color: var(--text);
+  font-size: 1.5rem;
+}
+
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.tab {
+  cursor: pointer;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tabActive {
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  position: relative;
+}
+
+.tabActive::before {
+  content: '🔥'; /* Netflix flame icon equivalent */
+  font-size: 0.9em;
+}
+
+.rowContainer {
+  position: relative;
+  width: 100%;
+}
+
+.row {
   display: flex;
   gap: 1rem;
-  margin-top: 2rem;
-  justify-content: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 1rem 0;
+  scrollbar-width: none;
+  cursor: grab;
 }
 
-.primaryButton,
-.secondaryButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.875rem 2rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
-  text-decoration: none;
+.row:active {
+  cursor: grabbing;
 }
 
-.primaryButton {
-  background: linear-gradient(45deg, #8b5cf6, #ec4899);
-  color: white;
-  border: none;
+.row::-webkit-scrollbar {
+  display: none;
 }
 
-.primaryButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+.row > * {
+  flex: 0 0 auto;
+  width: 200px;
 }
 
-.secondaryButton {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.secondaryButton:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-}
-
-.features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  margin-top: 3rem;
-}
-
-.feature {
+.error {
+  color: var(--text);
+  background: var(--primary);
+  padding: 1rem;
   text-align: center;
-  padding: 2rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1rem;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.feature:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-}
-
-.featureIcon {
-  width: 64px;
-  height: 64px;
-  margin: 0 auto 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  color: #8b5cf6;
-  background: rgba(139, 92, 246, 0.1);
-  border-radius: 1rem;
-}
-
-.feature h2 {
-  font-size: 1.5rem;
   font-weight: 600;
-  margin: 0 0 1rem;
-  color: #fff;
-}
-
-.feature p {
-  color: #a1a1aa;
-  margin: 0;
-  line-height: 1.6;
 }
 
 @media (max-width: 768px) {
-  .mainHero {
-    min-height: 400px;
-    padding: 3rem 1rem;
-  }
-
-  .heroButtons {
+  .sectionHeader {
     flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
   }
-
-  .primaryButton,
-  .secondaryButton {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .features {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+  .row > * {
+    width: 140px;
   }
 } 

@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
-import type { NextPage } from 'next';
+import { useState } from 'react';
+import type { NextPage, GetStaticProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import Layout from '../../components/Layout';
-import styles from '../../styles/Ranobe.module.css';
+import styles from '../../styles/Anime.module.css';
 import heroStyles from '../../styles/Hero.module.css';
 import { FaStar } from 'react-icons/fa';
 import CardStyles from '../../styles/Card.module.css';
+import { fetchWithRetry } from '../../utils/api';
 
 interface Anime {
   mal_id: number;
@@ -22,26 +23,51 @@ interface Anime {
   episodes: number;
 }
 
-const UpcomingAnimePage: NextPage = () => {
-  const [anime, setAnime] = useState<Anime[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface UpcomingAnimePageProps {
+  initialAnime: Anime[];
+  initialHasMore: boolean;
+  initialError: string | null;
+}
+
+export const getStaticProps: GetStaticProps<UpcomingAnimePageProps> = async () => {
+  try {
+    const data = await fetchWithRetry('https://api.jikan.moe/v4/seasons/upcoming?page=1');
+    return {
+      props: {
+        initialAnime: data?.data || [],
+        initialHasMore: data?.pagination?.has_next_page || false,
+        initialError: null,
+      },
+      revalidate: 3600, // Revalidate every hour
+    };
+  } catch (err) {
+    console.error('Error in getStaticProps for upcoming anime:', err);
+    return {
+      props: {
+        initialAnime: [],
+        initialHasMore: false,
+        initialError: 'Произошла ошибка при загрузке данных со стороны сервера.',
+      },
+      revalidate: 60,
+    };
+  }
+};
+
+const UpcomingAnimePage: NextPage<UpcomingAnimePageProps> = ({ initialAnime, initialHasMore, initialError }) => {
+  const [anime, setAnime] = useState<Anime[]>(initialAnime);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(initialError);
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(initialHasMore);
 
   const fetchAnime = async (currentPage: number) => {
+    setLoading(true);
     try {
       const response = await fetch(`https://api.jikan.moe/v4/seasons/upcoming?page=${currentPage}`);
       if (!response.ok) throw new Error('Ошибка при загрузке данных');
       
       const data = await response.json();
-      
-      if (currentPage === 1) {
-        setAnime(data.data);
-      } else {
-        setAnime(prev => [...prev, ...data.data]);
-      }
-      
+      setAnime(prev => [...prev, ...data.data]);
       setHasMore(data.pagination.has_next_page);
     } catch (err) {
       console.error('Error fetching anime:', err);
@@ -50,10 +76,6 @@ const UpcomingAnimePage: NextPage = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchAnime(1);
-  }, []);
 
   const loadMore = () => {
     if (!loading && hasMore) {
@@ -92,18 +114,7 @@ const UpcomingAnimePage: NextPage = () => {
     </Link>
   );
 
-  if (loading && page === 1) {
-    return (
-      <Layout>
-        <div className={styles.loading}>
-          <div className={styles.spinner}></div>
-          <p>Загрузка аниме...</p>
-        </div>
-      </Layout>
-    );
-  }
-
-  if (error) {
+  if (error && anime.length === 0) {
     return (
       <Layout>
         <div className={styles.error}>{error}</div>
@@ -128,7 +139,8 @@ const UpcomingAnimePage: NextPage = () => {
       </div>
 
       <div className={styles.container}>
-        <div className={styles.ranobeGrid}>
+        {error && <div className={styles.error}>{error}</div>}
+        <div className={styles.grid}>
           {anime.map(renderAnimeCard)}
         </div>
 

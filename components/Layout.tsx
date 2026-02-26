@@ -1,8 +1,8 @@
-import { ReactNode } from 'react';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import styles from '../styles/Layout.module.css';
-import { FaSearch, FaTelegram, FaGithub, FaEnvelope } from 'react-icons/fa';
+import { ReactNode, useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import styles from "../styles/Layout.module.css";
+import { FaSearch, FaTelegram, FaGithub, FaEnvelope } from "react-icons/fa";
 
 interface LayoutProps {
   children: ReactNode;
@@ -10,109 +10,78 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const router = useRouter();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const isActive = (path: string) => {
-    return router.pathname === path;
+    return router.pathname === path || (path !== '/' && router.pathname.startsWith(path));
   };
+
+  const isHomePage = router.pathname === '/';
 
   return (
     <div className={styles.wrapper}>
-      <header className={styles.header}>
-        <nav className={styles.nav}>
-          <div className={styles.navContent}>
-            <Link href="/" className={styles.logo}>
-              AnimeList
-            </Link>
-
-            <div className={styles.mainNav}>
-              <Link
-                href="/anime"
-                className={`${styles.navLink} ${isActive('/anime') ? styles.active : ''}`}
-              >
-                Аниме
+      <header className={`${styles.header} ${scrolled ? styles.headerScrolled : ''} ${!isHomePage ? styles.headerSolid : ''}`}>
+        <div className={styles.headerContent}>
+          <nav className={styles.nav}>
+            <div className={styles.navLeft}>
+              <Link href="/" className={styles.logo}>
+                ANIMELIST
               </Link>
-              <Link
-                href="/catalog"
-                className={`${styles.navLink} ${isActive('/catalog') ? styles.active : ''}`}
-              >
-                Манга
-              </Link>
-              <Link
-                href="/ranobe"
-                className={`${styles.navLink} ${isActive('/ranobe') ? styles.active : ''}`}
-              >
-                Ранобэ
-              </Link>
-              <Link
-                href="/catalog"
-                className={`${styles.navLink} ${isActive('/catalog') ? styles.active : ''}`}
-              >
-                Каталог
-              </Link>
-              <Link
-                href="/news"
-                className={`${styles.navLink} ${isActive('/news') ? styles.active : ''}`}
-              >
-                Новости
-              </Link>
+              <div className={styles.mainNav}>
+                <Link href="/" className={`${styles.navLink} ${isActive("/") ? styles.active : ""}`}>Home</Link>
+                <Link href="/anime" className={`${styles.navLink} ${isActive("/anime") ? styles.active : ""}`}>Catalog</Link>
+                <Link href="/anime/popular" className={`${styles.navLink} ${isActive("/anime/popular") ? styles.active : ""}`}>Popular</Link>
+              </div>
             </div>
-
-            <div className={styles.searchIcon}>
+            <div className={styles.navRight}>
               <Link href="/search" className={styles.iconButton}>
                 <FaSearch />
               </Link>
             </div>
-          </div>
-        </nav>
+          </nav>
+        </div>
       </header>
 
-      <main className={styles.main}>
-        {children}
-      </main>
+      <main className={styles.main} style={{ paddingTop: isHomePage ? 0 : '80px' }}>{children}</main>
 
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
           <div className={styles.footerSection}>
-            <h3>База данных</h3>
+            <h3>Resource</h3>
             <ul>
-              <li><Link href="/anime">Аниме</Link></li>
-              <li><Link href="/manga">Манга</Link></li>
-              <li><Link href="/ranobe">Ранобэ</Link></li>
-              <li><Link href="/catalog">Каталог</Link></li>
+              <li><Link href="/anime">Anime</Link></li>
+              <li><Link href="/catalog">Catalog</Link></li>
             </ul>
           </div>
-
           <div className={styles.footerSection}>
-            <h3>О проекте</h3>
+            <h3>Legal</h3>
             <ul>
-              <li><Link href="/about">О нас</Link></li>
-              <li><Link href="/rules">Правила</Link></li>
-              <li><Link href="/help">Помощь</Link></li>
+              <li><Link href="/about">Terms Of Use</Link></li>
+              <li><Link href="/rules">Privacy Policy</Link></li>
+              <li><Link href="/help">Security</Link></li>
             </ul>
           </div>
-
           <div className={styles.footerSection}>
-            <h3>Контакты</h3>
+            <h3>Contact Us</h3>
             <ul className={styles.contactsList}>
-              <li>
-                <a href="https://t.me/Shaember" target="_blank" rel="noopener noreferrer">
-                  <FaTelegram /> Telegram
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/Shaember" target="_blank" rel="noopener noreferrer">
-                  <FaGithub /> Github
-                </a>
-              </li>
-              <li>
-                <a href="mailto:shaember@yandex.ru">
-                  <FaEnvelope /> shaember@yandex.ru
-                </a>
-              </li>
+              <li><a href="https://t.me/Shaember" target="_blank" rel="noopener noreferrer"><FaTelegram /> Telegram</a></li>
+              <li><a href="https://github.com/Shaember" target="_blank" rel="noopener noreferrer"><FaGithub /> Github</a></li>
+              <li><a href="mailto:shaember@yandex.ru"><FaEnvelope /> Mail</a></li>
             </ul>
           </div>
+        </div>
+        <div className={styles.footerBottom}>
+          <p>©2026 AnimeList. All Right Reserved.</p>
         </div>
       </footer>
     </div>
   );
-} 
+}

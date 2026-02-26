@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useState } from 'react';
+import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Layout from '../../components/Layout';
 import styles from '../../styles/AnimeDetail.module.css';
 import { FaStar, FaPlay, FaHeart, FaBookmark, FaShare, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { IoTimeOutline, IoCalendarOutline, IoTvOutline, IoPeopleOutline, IoPencilOutline } from 'react-icons/io5';
 import Link from 'next/link';
+import { fetchWithRetry, delay } from '../../utils/api';
 
 interface Character {
   character: {
@@ -88,78 +89,62 @@ interface AnimeRecommendation {
   votes: number;
 }
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+interface AnimeDetailPageProps {
+  anime: AnimeDetail | null;
+  characters: Character[];
+  staff: Staff[];
+  recommendations: AnimeRecommendation[];
+  error: string | null;
+}
 
-const fetchWithRetry = async (url: string, retries = 3) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      if (i === retries - 1) throw error;
-      await delay(1000); // Ждем секунду перед повторной попыткой
-    }
+export const getServerSideProps: GetServerSideProps<AnimeDetailPageProps> = async ({ params, res }) => {
+  res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=3600, stale-while-revalidate=86400'
+  );
+
+  const id = params?.id;
+  
+  if (!id || typeof id !== 'string') {
+    return { notFound: true };
+  }
+
+  try {
+    const animeData = await fetchWithRetry(`https://api.jikan.moe/v4/anime/${id}`);
+    await delay(500);
+    const charactersData = await fetchWithRetry(`https://api.jikan.moe/v4/anime/${id}/characters`);
+    await delay(500);
+    const staffData = await fetchWithRetry(`https://api.jikan.moe/v4/anime/${id}/staff`);
+    await delay(500);
+    const recommendationsData = await fetchWithRetry(`https://api.jikan.moe/v4/anime/${id}/recommendations`);
+
+    return {
+      props: {
+        anime: animeData?.data || null,
+        characters: charactersData?.data || [],
+        staff: staffData?.data || [],
+        recommendations: recommendationsData?.data || [],
+        error: null,
+      },
+    };
+  } catch (err) {
+    console.error('Error fetching anime detail data in getServerSideProps:', err);
+    return {
+      props: {
+        anime: null,
+        characters: [],
+        staff: [],
+        recommendations: [],
+        error: 'Произошла ошибка при загрузке данных об аниме.',
+      },
+    };
   }
 };
 
-export default function AnimeDetailPage() {
-  const router = useRouter();
-  const { id } = router.query;
-  const [anime, setAnime] = useState<AnimeDetail | null>(null);
-  const [characters, setCharacters] = useState<Character[]>([]);
-  const [staff, setStaff] = useState<Staff[]>([]);
-  const [recommendations, setRecommendations] = useState<AnimeRecommendation[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export default function AnimeDetailPage({ anime, characters, staff, recommendations, error }: AnimeDetailPageProps) {
   const [showAllStaff, setShowAllStaff] = useState(false);
   const [showAllCharacters, setShowAllCharacters] = useState(false);
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
-
-  useEffect(() => {
-    const fetchAnimeData = async () => {
-      if (!id) return;
-
-      setLoading(true);
-      setError(null);
-
-      try {
-        const animeData = await fetchWithRetry(`https://api.jikan.moe/v4/anime/${id}`);
-        await delay(1000);
-        const charactersData = await fetchWithRetry(`https://api.jikan.moe/v4/anime/${id}/characters`);
-        await delay(1000);
-        const staffData = await fetchWithRetry(`https://api.jikan.moe/v4/anime/${id}/staff`);
-        await delay(1000);
-        const recommendationsData = await fetchWithRetry(`https://api.jikan.moe/v4/anime/${id}/recommendations`);
-
-        setAnime(animeData.data);
-        setCharacters(charactersData.data);
-        setStaff(staffData.data);
-        setRecommendations(recommendationsData.data);
-      } catch (err) {
-        console.error('Error fetching anime data:', err);
-        setError('Произошла ошибка при загрузке данных. Пожалуйста, подождите немного и обновите страницу.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAnimeData();
-  }, [id]);
-
-  if (loading) {
-    return (
-      <Layout>
-        <div className={styles.loading}>
-          <div className={styles.spinner}></div>
-          <p>Загрузка информации об аниме...</p>
-        </div>
-      </Layout>
-    );
-  }
 
   if (error || !anime) {
     return (
@@ -199,14 +184,7 @@ export default function AnimeDetailPage() {
                   <FaPlay />
                   <span>Смотреть</span>
                 </Link>
-                <button type="button" className={`${styles.actionButton} ${styles.listButton}`}>
-                  <FaBookmark />
-                  <span>Добавить в список</span>
-                </button>
-                <button type="button" className={`${styles.actionButton} ${styles.favoriteButton}`}>
-                  <FaHeart />
-                  <span>В избранное</span>
-                </button>
+
                 <button type="button" className={`${styles.actionButton} ${styles.shareButton}`}>
                   <FaShare />
                   <span>Поделиться</span>

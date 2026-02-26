@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import type { NextPage } from 'next';
+import type { NextPage, GetStaticProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import Layout from '../components/Layout';
-import styles from '../styles/Ranobe.module.css';
-import heroStyles from '../styles/Hero.module.css';
-import { FaFire, FaCalendarAlt, FaStar, FaChevronRight } from 'react-icons/fa';
+import styles from '../styles/Anime.module.css';
+import { FaFire, FaClapperboard, FaStar } from 'react-icons/fa6';
+import { FaChevronRight } from 'react-icons/fa';
 import CardStyles from '../styles/Card.module.css';
+import { fetchWithRetry, delay } from '../utils/api';
 
 interface Anime {
   mal_id: number;
@@ -21,71 +21,48 @@ interface Anime {
   type: string;
   episodes: number;
   status: string;
+  year: number;
 }
 
-interface Section {
-  title: string;
-  icon: JSX.Element;
-  endpoint: string;
+interface AnimePageProps {
+  trendingAnime: Anime[];
+  newAnime: Anime[];
+  upcomingAnime: Anime[];
+  error?: string | null;
 }
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+export const getStaticProps: GetStaticProps<AnimePageProps> = async () => {
+  try {
+    const trendingData = await fetchWithRetry('https://api.jikan.moe/v4/top/anime');
+    await delay(1000); // Respect API rate limits
+    const newData = await fetchWithRetry('https://api.jikan.moe/v4/seasons/now');
+    await delay(1000);
+    const upcomingData = await fetchWithRetry('https://api.jikan.moe/v4/seasons/upcoming');
 
-const fetchWithRetry = async (url: string, retries = 3) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      if (i === retries - 1) throw error;
-      await delay(1000);
-    }
+    return {
+      props: {
+        trendingAnime: trendingData?.data?.slice(0, 18) || [],
+        newAnime: newData?.data?.slice(0, 18) || [],
+        upcomingAnime: upcomingData?.data?.slice(0, 18) || [],
+        error: null,
+      },
+      revalidate: 3600, // Revalidate every hour
+    };
+  } catch (err) {
+    console.error('Error fetching anime data in getStaticProps:', err);
+    return {
+      props: {
+        trendingAnime: [],
+        newAnime: [],
+        upcomingAnime: [],
+        error: 'Произошла ошибка при загрузке данных со стороны сервера.',
+      },
+      revalidate: 60, // Try generating again sooner if error
+    };
   }
 };
 
-const AnimePage: NextPage = () => {
-  const [trendingAnime, setTrendingAnime] = useState<Anime[]>([]);
-  const [newAnime, setNewAnime] = useState<Anime[]>([]);
-  const [upcomingAnime, setUpcomingAnime] = useState<Anime[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const sections: Section[] = [
-    { title: 'Популярное аниме', icon: <FaFire />, endpoint: 'top/anime' },
-    { title: 'Новое аниме', icon: <FaCalendarAlt />, endpoint: 'seasons/now' },
-    { title: 'Скоро выйдет', icon: <FaStar />, endpoint: 'seasons/upcoming' }
-  ];
-
-  useEffect(() => {
-    const fetchAnimeData = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const trendingData = await fetchWithRetry('https://api.jikan.moe/v4/top/anime');
-        await delay(1000);
-        const newData = await fetchWithRetry('https://api.jikan.moe/v4/seasons/now');
-        await delay(1000);
-        const upcomingData = await fetchWithRetry('https://api.jikan.moe/v4/seasons/upcoming');
-
-        setTrendingAnime(trendingData.data.slice(0, 12));
-        setNewAnime(newData.data.slice(0, 12));
-        setUpcomingAnime(upcomingData.data.slice(0, 12));
-      } catch (err) {
-        console.error('Error fetching anime data:', err);
-        setError('Произошла ошибка при загрузке данных. Пожалуйста, подождите немного и обновите страницу.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAnimeData();
-  }, []);
-
+const AnimePage: NextPage<AnimePageProps> = ({ trendingAnime, newAnime, upcomingAnime, error }) => {
   const renderAnimeCard = (anime: Anime) => (
     <Link href={`/anime/${anime.mal_id}`} key={anime.mal_id} className={CardStyles.card}>
       <div className={CardStyles.imageWrapper}>
@@ -99,32 +76,17 @@ const AnimePage: NextPage = () => {
             <span className={CardStyles.score}>
               <FaStar /> {anime.score || '??'}
             </span>
-            <span className={CardStyles.episodes}>
-              {anime.episodes ? `${anime.episodes} эп.` : 'TBA'}
-            </span>
           </div>
         </div>
       </div>
       <div className={CardStyles.content}>
         <h3 className={CardStyles.title}>{anime.title}</h3>
         <div className={CardStyles.info}>
-          <span className={CardStyles.type}>{anime.type}</span>
-          <span className={CardStyles.members}>{anime.members.toLocaleString()} участников</span>
+          <span className={CardStyles.type}>{anime.year || 'TBA'}</span>
         </div>
       </div>
     </Link>
   );
-
-  if (loading) {
-    return (
-      <Layout>
-        <div className={styles.loading}>
-          <div className={styles.spinner}></div>
-          <p>Загрузка аниме...</p>
-        </div>
-      </Layout>
-    );
-  }
 
   if (error) {
     return (
@@ -137,35 +99,30 @@ const AnimePage: NextPage = () => {
   return (
     <Layout>
       <Head>
-        <title>AnimeList - Аниме</title>
-        <meta name="description" content="Смотрите аниме онлайн" />
+        <title>AnimeList - Catalog</title>
+        <meta name="description" content="Anime Catalog" />
       </Head>
 
-      <div className={heroStyles.hero}>
-        <div className={heroStyles.heroContent}>
-          <h1 className={heroStyles.heroTitle}>
-            Исследуйте мир аниме
-          </h1>
-          <p className={heroStyles.heroSubtitle}>
-            Откройте для себя лучшие японские анимационные сериалы
-          </p>
-        </div>
-      </div>
-
       <div className={styles.container}>
+        <div className={styles.filtersRow}>
+          <span className={styles.filterLabel}>Sort by:</span>
+          <button className={styles.filterPillActive}>Latest</button>
+          <button className={styles.filterPill}>Year</button>
+          <button className={styles.filterPill}>A-Z</button>
+        </div>
+
         <div className={styles.sections}>
           {trendingAnime.length > 0 && (
             <section className={styles.section}>
               <div className={styles.sectionHeader}>
                 <h2 className={styles.sectionTitle}>
-                  <FaFire className={styles.sectionIcon} />
-                  Популярное аниме
+                  <FaFire className={styles.sectionIcon} /> Popular Anime
                 </h2>
                 <Link href="/anime/popular" className={styles.viewAll}>
-                  Смотреть все <FaChevronRight />
+                  View All <FaChevronRight />
                 </Link>
               </div>
-              <div className={styles.ranobeGrid}>
+              <div className={styles.grid}>
                 {trendingAnime.map(renderAnimeCard)}
               </div>
             </section>
@@ -175,14 +132,13 @@ const AnimePage: NextPage = () => {
             <section className={styles.section}>
               <div className={styles.sectionHeader}>
                 <h2 className={styles.sectionTitle}>
-                  <FaCalendarAlt className={styles.sectionIcon} />
-                  Новое аниме
+                  <FaClapperboard className={styles.sectionIcon} /> Streaming Now
                 </h2>
                 <Link href="/anime/new" className={styles.viewAll}>
-                  Смотреть все <FaChevronRight />
+                  View All <FaChevronRight />
                 </Link>
               </div>
-              <div className={styles.ranobeGrid}>
+              <div className={styles.grid}>
                 {newAnime.map(renderAnimeCard)}
               </div>
             </section>
@@ -192,14 +148,13 @@ const AnimePage: NextPage = () => {
             <section className={styles.section}>
               <div className={styles.sectionHeader}>
                 <h2 className={styles.sectionTitle}>
-                  <FaStar className={styles.sectionIcon} />
-                  Скоро выйдет
+                  <FaStar className={styles.sectionIcon} /> Upcoming
                 </h2>
                 <Link href="/anime/upcoming" className={styles.viewAll}>
-                  Смотреть все <FaChevronRight />
+                  View All <FaChevronRight />
                 </Link>
               </div>
-              <div className={styles.ranobeGrid}>
+              <div className={styles.grid}>
                 {upcomingAnime.map(renderAnimeCard)}
               </div>
             </section>
