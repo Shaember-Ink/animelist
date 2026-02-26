@@ -72,9 +72,7 @@ export default function Layout({ children }: LayoutProps) {
           <div className={styles.footerSection}>
             <h3>Contact Us</h3>
             <ul className={styles.contactsList}>
-              <li><a href="https://t.me/Shaember" target="_blank" rel="noopener noreferrer"><FaTelegram /> Telegram</a></li>
-              <li><a href="https://github.com/Shaember" target="_blank" rel="noopener noreferrer"><FaGithub /> Github</a></li>
-              <li><a href="mailto:shaember@yandex.ru"><FaEnvelope /> Mail</a></li>
+              <li><Link href="/help"><FaEnvelope /> Support</Link></li>
             </ul>
           </div>
         </div>

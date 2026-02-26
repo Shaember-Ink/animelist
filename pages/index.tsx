@@ -110,8 +110,11 @@ const Home: NextPage<HomePageProps> = ({ trendingAnime, newAnime, upcomingAnime,
 
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     const el = e.currentTarget;
-    if (e.deltaY !== 0) {
-      el.scrollLeft += e.deltaY;
+    if (e.deltaX !== 0 || Math.abs(e.deltaY) > 0) {
+      // If the scroll is mostly horizontal or we want to force horizontal scroll
+      // preventDefault here ensures the page doesn't try to scroll vertically/diagonally
+      e.preventDefault();
+      el.scrollLeft += (e.deltaY + e.deltaX);
     }
   };
 
