@@ -36,17 +36,17 @@
 
 ### Home Page & Hero Carousel
 
-![Home Page](/Users/sorakonjiro/.gemini/antigravity/brain/41093953-af8f-4d5b-aede-224c8f46cf93/home_page_redesign_1772137082394.png)
+![Home Page](public/assets/home_hero.png)
 _Modern hero banner with dynamic carousel and left-aligned typography._
 
 ### Content Discovery
 
-![Content Rows](/Users/sorakonjiro/.gemini/antigravity/brain/41093953-af8f-4d5b-aede-224c8f46cf93/home_page_scrolled_1772136000339.png)
+![Content Rows](public/assets/home_discovery.png)
 _Horizontal scrolling rows for browsing categories like Trends Now and Top Upcoming._
 
 ### Anime Details
 
-![Anime Detail](/Users/sorakonjiro/.gemini/antigravity/brain/41093953-af8f-4d5b-aede-224c8f46cf93/anime_detail_redesign_1772137159801.png)
+![Anime Detail](public/assets/anime_detail.png)
 _Streamlined detail page with prominent Watch Now call-to-actions._
 
 ## 🚀 Quick Start
