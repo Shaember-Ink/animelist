@@ -1,73 +1,89 @@
 .container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem 4%;
+  padding: 0 0 4rem 0;
+  min-height: 100vh;
+  background: #000;
 }
 
-.playerSection {
+.theatreSection {
+  position: relative;
+  width: 100%;
+  padding: 4rem 4% 2rem 4%;
+  background: radial-gradient(circle at 50% 30%, rgba(229, 9, 20, 0.08) 0%, transparent 60%);
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  max-width: 1000px;
-  margin: 0 auto;
+  align-items: center;
+}
+
+.contentWrapper {
+  width: 100%;
+  max-width: 1200px;
+  position: relative;
+  z-index: 1;
+}
+
+.ambientGlow {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  height: 70%;
+  background: radial-gradient(circle, rgba(229, 9, 20, 0.15), transparent 60%);
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .videoWrapper {
   position: relative;
-  padding-bottom: 56.25%; /* 16:9 */
-  height: 0;
+  width: 100%;
+  aspect-ratio: 16/9;
+  z-index: 1;
+  border-radius: 12px;
   overflow: hidden;
-  border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05),
+              0 30px 60px -12px rgba(0, 0, 0, 0.8),
+              0 0 100px rgba(229, 9, 20, 0.3); /* Premium red glow */
   background: #000;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  margin-bottom: 2rem;
 }
 
 .videoPlayer {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   border: none;
 }
 
-.playerInfo {
+.infoSection {
+  width: 100%;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  flex-direction: column;
   gap: 2rem;
 }
 
-.episodeInfo {
-  flex: 1;
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 1.5rem;
 }
 
 .title {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 2.5rem;
+  font-weight: 800;
   color: #fff;
   margin: 0 0 0.5rem 0;
-}
-
-.backToDetails {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #e50914;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.9rem;
-  margin-top: 1rem;
-  transition: color 0.2s ease;
-}
-
-.backToDetails:hover {
-  color: #ff0000;
+  letter-spacing: -0.5px;
 }
 
 .episodeTitle {
-  font-size: 1.1rem;
-  color: #aaa;
+  font-size: 1.25rem;
+  color: #e50914;
+  font-weight: 600;
   margin: 0;
 }
 
@@ -79,30 +95,38 @@
 .actionButton {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.6rem;
   padding: 0.75rem 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
   color: #fff;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
 }
 
 .actionButton:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
 }
 
-.shareButton {
-  background: transparent;
+.backToDetails {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  transition: color 0.2s ease;
 }
 
-.shareButton.shared {
-  background: rgba(34, 197, 94, 0.2);
-  border-color: #22c55e;
+.backToDetails:hover {
+  color: #fff;
 }
 
 .loading {
@@ -110,17 +134,18 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 400px;
+  min-height: 80vh;
   gap: 1.5rem;
+  background: #000;
 }
 
 .spinner {
   width: 50px;
   height: 50px;
-  border: 3px solid rgba(255, 255, 255, 0.1);
+  border: 3px solid rgba(229, 9, 20, 0.1);
   border-top-color: #e50914;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 @keyframes spin {
@@ -132,47 +157,53 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 60vh;
+  min-height: 80vh;
   text-align: center;
   padding: 2rem;
+  background: #000;
 }
 
 .error p {
   font-size: 1.25rem;
   margin-bottom: 2rem;
-  color: #aaa;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .backButton {
-  padding: 0.75rem 2rem;
-  border-radius: 4px;
+  padding: 0.8rem 2.5rem;
+  border-radius: 8px;
   background: #e50914;
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: none;
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .backButton:hover {
-  background: #bf0812;
+  background: #ff0a16;
+  transform: scale(1.05);
 }
 
-@media (max-width: 768px) {
-  .playerInfo {
+@media (max-width: 1000px) {
+  .header {
     flex-direction: column;
-    gap: 1.5rem;
+    align-items: flex-start;
+    gap: 1rem;
   }
   
   .title {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
   }
   
-  .controls {
-    width: 100%;
+  .videoWrapper {
+    max-width: 100%;
   }
-  
+}
+
+@media (max-width: 600px) {
   .actionButton {
-    flex: 1;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
   }
 }
  

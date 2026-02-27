@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
@@ -20,59 +20,59 @@ interface AnimeDetails {
 }
 
 interface WatchAnimePageProps {
-  initialAnimeDetails: AnimeDetails | null;
-  error: string | null;
+  id: string;
 }
 
-export const getServerSideProps: GetServerSideProps<WatchAnimePageProps> = async ({ params, res }) => {
-  res.setHeader(
-    'Cache-Control',
-    'public, s-maxage=3600, stale-while-revalidate=86400'
-  );
-
+export const getServerSideProps: GetServerSideProps<WatchAnimePageProps> = async ({ params }) => {
   const id = params?.id;
-
   if (!id || typeof id !== 'string') {
     return { notFound: true };
   }
-
-  try {
-    const data = await fetchWithRetry(`https://api.jikan.moe/v4/anime/${id}`);
-    
-    if (!data || !data.data) {
-      throw new Error('Не удалось загрузить информацию об аниме');
-    }
-
-    const animeDetails: AnimeDetails = {
-      id: id,
-      title: data.data.title,
-      episodes: Array.from({ length: data.data.episodes || 1 }, (_, i) => ({
-        number: i + 1
-      })),
-      shikimori_id: data.data.mal_id.toString()
-    };
-
-    return {
-      props: {
-        initialAnimeDetails: animeDetails,
-        error: null,
-      },
-    };
-  } catch (err) {
-    console.error('Error fetching anime details in getServerSideProps:', err);
-    return {
-      props: {
-        initialAnimeDetails: null,
-        error: 'Произошла ошибка при загрузке данных',
-      },
-    };
-  }
+  return {
+    props: { id }
+  };
 };
 
-export default function WatchAnime({ initialAnimeDetails, error }: WatchAnimePageProps) {
+export default function WatchAnime({ id }: WatchAnimePageProps) {
   const router = useRouter();
+  const [initialAnimeDetails, setInitialAnimeDetails] = useState<AnimeDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [currentEpisode, setCurrentEpisode] = useState<number>(1);
   const [shareStatus, setShareStatus] = useState<'default' | 'copied' | 'shared'>('default');
+
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchDetails = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchWithRetry(`https://api.jikan.moe/v4/anime/${id}`);
+        
+        if (!data || !data.data) {
+          throw new Error('Не удалось загрузить информацию об аниме');
+        }
+
+        const animeDetails: AnimeDetails = {
+          id: id,
+          title: data.data.title,
+          episodes: Array.from({ length: data.data.episodes || 1 }, (_, i) => ({
+            number: i + 1
+          })),
+          shikimori_id: data.data.mal_id.toString()
+        };
+        setInitialAnimeDetails(animeDetails);
+      } catch (err) {
+        console.error('Error fetching anime details:', err);
+        setError('Произошла ошибка при загрузке данных');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDetails();
+  }, [id]);
 
   const handleShare = async () => {
     const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
@@ -121,6 +121,17 @@ export default function WatchAnime({ initialAnimeDetails, error }: WatchAnimePag
     }
   };
 
+  if (loading) {
+    return (
+      <Layout>
+        <div className={styles.loading}>
+          <div className={styles.spinner}></div>
+          <p>Загрузка плеера...</p>
+        </div>
+      </Layout>
+    );
+  }
+
   if (error || !initialAnimeDetails) {
     return (
       <Layout>
@@ -142,35 +153,38 @@ export default function WatchAnime({ initialAnimeDetails, error }: WatchAnimePag
       </Head>
 
       <div className={styles.container}>
-        <div className={styles.playerSection}>
-          <div className={styles.videoWrapper}>
-            <iframe
-              src={`https://kodik.info/find-player?shikimoriID=${initialAnimeDetails.shikimori_id}&episode=${currentEpisode}`}
-              className={styles.videoPlayer}
-              frameBorder="0"
-              allowFullScreen
-              allow="autoplay *; fullscreen *"
-            />
-          </div>
-
-          <div className={styles.playerInfo}>
-            <div className={styles.episodeInfo}>
-              <h1 className={styles.title}>{initialAnimeDetails.title}</h1>
-              <p className={styles.episodeTitle}>
-                Episode {currentEpisode}
-              </p>
-              <Link href={`/anime/${initialAnimeDetails.id}`} className={styles.backToDetails}>
-                <FaList /> Back to Details
-              </Link>
+        <div className={styles.theatreSection}>
+          <div className={styles.ambientGlow} />
+          
+          <div className={styles.contentWrapper}>
+            <div className={styles.videoWrapper}>
+              <iframe
+                src={`https://kodik.info/find-player?shikimoriID=${initialAnimeDetails.shikimori_id}`}
+                className={styles.videoPlayer}
+                frameBorder="0"
+                allowFullScreen
+                allow="autoplay *; fullscreen *"
+              />
             </div>
 
-            <div className={styles.controls}>
-              <button 
-                className={`${styles.actionButton} ${styles.shareButton} ${shareStatus !== 'default' ? styles.shared : ''}`}
-                onClick={handleShare}
-              >
-                {getShareButtonContent()}
-              </button>
+            <div className={styles.infoSection}>
+              <div className={styles.header}>
+                <div className={styles.episodeInfo}>
+                  <h1 className={styles.title}>{initialAnimeDetails.title}</h1>
+                  <Link href={`/anime/${initialAnimeDetails.id}`} className={styles.backToDetails}>
+                    <FaList /> К описанию аниме
+                  </Link>
+                </div>
+
+                <div className={styles.controls}>
+                  <button 
+                    className={`${styles.actionButton} ${shareStatus !== 'default' ? styles.shared : ''}`}
+                    onClick={handleShare}
+                  >
+                    {getShareButtonContent()}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
