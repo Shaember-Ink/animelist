@@ -34,8 +34,9 @@ export default function Help() {
           <section className={styles.section}>
             <h2>Support</h2>
             <p>
-              If you have suggestions for new features or encounter any bugs, please reach out to us
-              via the contact links in the footer. We are constantly working to improve this experimental platform.
+              As this is an experimental and educational project, direct support is not provided. 
+              We are constantly working to improve this platform's stability. If you're a developer, 
+              feel free to explore the repository for implementation details.
             </p>
           </section>
         </div>
