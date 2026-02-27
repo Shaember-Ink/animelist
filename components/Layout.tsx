@@ -65,8 +65,8 @@ export default function Layout({ children }: LayoutProps) {
           <div className={styles.footerSection}>
             <h3>Resource</h3>
             <ul>
-              <li><Link href="/anime">Anime</Link></li>
-              <li><Link href="/catalog">Catalog</Link></li>
+              <li><Link href="/anime">All Anime</Link></li>
+              <li><Link href="/anime">Catalog</Link></li>
             </ul>
           </div>
           <div className={styles.footerSection}>

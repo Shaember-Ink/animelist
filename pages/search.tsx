@@ -100,15 +100,15 @@ export default function Search() {
   return (
     <Layout>
       <Head>
-        <title>Поиск аниме - AnimeList</title>
-        <meta name="description" content="Поиск аниме на AnimeList" />
+        <title>Search Anime - AnimeList</title>
+        <meta name="description" content="Search for your favorite anime on AnimeList" />
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       </Head>
 
       <div className={styles.heroSection}>
         <div className={styles.heroContent}>
-          <h1 className={styles.heroTitle}>Поиск аниме</h1>
-          <p className={styles.heroSubtitle}>Найдите любимое аниме в нашей базе данных</p>
+          <h1 className={styles.heroTitle}>Search Anime</h1>
+          <p className={styles.heroSubtitle}>Find your favorite series in our extensive database</p>
         </div>
       </div>
 
@@ -119,7 +119,7 @@ export default function Search() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Введите название аниме..."
+            placeholder="Enter anime title..."
             className={styles.searchInput}
           />
         </div>
@@ -131,7 +131,7 @@ export default function Search() {
         {loading && page === 1 ? (
           <div className={styles.loading}>
             <div className={styles.spinner}></div>
-            <p>Поиск аниме...</p>
+            <p>Searching...</p>
           </div>
         ) : results.length > 0 ? (
           <>
@@ -157,12 +157,12 @@ export default function Search() {
                         )}
                         {anime.episodes && (
                           <span className={Card.episodes}>
-                            <IoTvOutline /> {anime.episodes} эп.
+                            <IoTvOutline /> {anime.episodes} ep.
                           </span>
                         )}
                       </div>
                       <button className={Card.watchButton}>
-                        <FaPlay /> Смотреть
+                        <FaPlay /> Watch Now
                       </button>
                     </div>
                   </div>
@@ -170,7 +170,7 @@ export default function Search() {
                     <h3 className={Card.title}>{anime.title}</h3>
                     <div className={Card.info}>
                       <span className={Card.type}>{anime.type}</span>
-                      <span className={Card.members}>{anime.members.toLocaleString()} участников</span>
+                      <span className={Card.members}>{anime.members.toLocaleString()} members</span>
                     </div>
                   </div>
                 </Link>
@@ -185,18 +185,18 @@ export default function Search() {
                 {loading ? (
                   <>
                     <div className={styles.spinnerSmall}></div>
-                    Загрузка...
+                    Loading...
                   </>
                 ) : (
-                  'Показать больше'
+                  'Show More'
                 )}
               </button>
             )}
           </>
         ) : query.trim() ? (
           <div className={styles.noResults}>
-            <p>По запросу "{query}" ничего не найдено</p>
-            <p>Попробуйте изменить запрос или проверить правильность написания</p>
+            <p>No results found for "{query}"</p>
+            <p>Try searching for something else or check your spelling.</p>
           </div>
         ) : null}
       </div>

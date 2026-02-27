@@ -55,7 +55,7 @@ export const getStaticProps: GetStaticProps<AnimePageProps> = async () => {
         trendingAnime: [],
         newAnime: [],
         upcomingAnime: [],
-        error: 'Произошла ошибка при загрузке данных со стороны сервера.',
+        error: 'An error occurred while loading data from the server.',
       },
       revalidate: 60, // Try generating again sooner if error
     };

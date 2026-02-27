@@ -1,43 +1,45 @@
 import Layout from '../components/Layout';
 import styles from '../styles/About.module.css';
+import Head from 'next/head';
 
 export default function Help() {
   return (
     <Layout>
+      <Head>
+        <title>Help & Support - AnimeList</title>
+      </Head>
       <div className={styles.container}>
-        <h1 className={styles.title}>Помощь</h1>
+        <h1 className={styles.title}>Help Center</h1>
         <div className={styles.content}>
           <section className={styles.section}>
-            <h2>Навигация по сайту</h2>
+            <h2>Site Navigation</h2>
             <p>
-              На сайте есть несколько основных разделов:
+              AnimeList provides a streamlined experience for anime fans:
             </p>
             <ul className={styles.list}>
-              <li><strong>Аниме</strong> - каталог аниме с возможностью поиска и фильтрации</li>
-              <li><strong>Манга</strong> - раздел с мангой различных жанров</li>
-              <li><strong>Ранобэ</strong> - коллекция ранобэ</li>
-              <li><strong>Каталог</strong> - общий каталог со всеми материалами</li>
-              <li><strong>Новости</strong> - актуальные новости из мира аниме и манги</li>
+              <li><strong>Home</strong> - Discover trending and upcoming series with our dynamic carousel.</li>
+              <li><strong>Catalog</strong> - Browse the full database with advanced filtering options.</li>
+              <li><strong>Search</strong> - Find specific series or characters using the search bar at the top right.</li>
             </ul>
           </section>
 
           <section className={styles.section}>
-            <h2>Поиск</h2>
+            <h2>Data Accuracy</h2>
             <p>
-              Для поиска контента используйте строку поиска в верхней части сайта. 
-              Вы можете искать по названию, жанрам и другим параметрам.
+              Our data is synced with MyAnimeList via the Jikan API. If you notice any discrepancies,
+              please verify the information on the source platform.
             </p>
           </section>
 
           <section className={styles.section}>
-            <h2>Обратная связь</h2>
+            <h2>Support</h2>
             <p>
-              Если у вас возникли вопросы или предложения, вы можете связаться с нами 
-              через контакты, указанные в нижней части сайта.
+              If you have suggestions for new features or encounter any bugs, please reach out to us
+              via the contact links in the footer. We are constantly working to improve this experimental platform.
             </p>
           </section>
         </div>
       </div>
     </Layout>
   );
-} 
+}

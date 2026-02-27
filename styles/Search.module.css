@@ -22,7 +22,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(45deg, rgba(126, 55, 230, 0.3), rgba(147, 83, 244, 0.3));
+  background: linear-gradient(45deg, rgba(229, 9, 20, 0.1), rgba(0, 0, 0, 0.5));
   z-index: 1;
 }
 
@@ -40,7 +40,7 @@
   color: #fff;
   margin-bottom: 0.5rem;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(45deg, #7e37e6, #9353f4);
+  background: linear-gradient(45deg, #e50914, #ff0000);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -72,8 +72,8 @@
   padding: 1.25rem 1.5rem 1.25rem 4rem;
   font-size: 1.1rem;
   background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
   color: #fff;
   transition: all 0.3s ease;
 }
@@ -81,8 +81,8 @@
 .searchInput:focus {
   outline: none;
   background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(126, 55, 230, 0.5);
-  box-shadow: 0 0 0 3px rgba(126, 55, 230, 0.25);
+  border-color: #e50914;
+  box-shadow: 0 0 10px rgba(229, 9, 20, 0.2);
 }
 
 .searchInput::placeholder {
@@ -184,17 +184,17 @@
   gap: 0.5rem;
   width: 100%;
   padding: 0.75rem;
-  background: linear-gradient(45deg, #7e37e6, #9353f4);
+  background: #e50914;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 4px;
   color: white;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.3s ease;
+  transition: background 0.3s ease;
 }
 
 .watchButton:hover {
-  opacity: 0.9;
+  background: #bf0812;
 }
 
 .content {
@@ -224,9 +224,9 @@
 
 .genre {
   padding: 0.25rem 0.75rem;
-  background: rgba(126, 55, 230, 0.2);
-  border: 1px solid rgba(126, 55, 230, 0.3);
-  border-radius: 1rem;
+  background: rgba(229, 9, 20, 0.1);
+  border: 1px solid rgba(229, 9, 20, 0.2);
+  border-radius: 4px;
   font-size: 0.8rem;
   color: #fff;
 }
@@ -268,7 +268,7 @@
 .spinnerSmall {
   border: 3px solid rgba(255, 255, 255, 0.1);
   border-radius: 50%;
-  border-top-color: #7e37e6;
+  border-top-color: #e50914;
   animation: spin 1s linear infinite;
 }
 
