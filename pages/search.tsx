@@ -48,6 +48,13 @@ export default function Search() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
 
+  // Filter States
+  const [type, setType] = useState('');
+  const [status, setStatus] = useState('');
+  const [rating, setRating] = useState('');
+  const [orderBy, setOrderBy] = useState('');
+  const [sortDir, setSortDir] = useState('desc');
+
   const searchAnime = async (currentPage: number) => {
     if (!query.trim()) {
       setResults([]);
@@ -59,9 +66,24 @@ export default function Search() {
     setError(null);
 
     try {
-      const response = await fetch(
-        `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&page=${currentPage}&limit=24&sfw=true`
-      );
+      let url = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&page=${currentPage}&limit=24&sfw=true`;
+      
+      if (type) url += `&type=${type}`;
+      if (status) url += `&status=${status}`;
+      if (rating) url += `&rating=${rating}`;
+      if (orderBy) {
+        url += `&order_by=${orderBy}&sort=${sortDir}`;
+      } else {
+        // Default sorting if no specific order is chosen but a query exists
+        if (query) {
+           // Let jikan handle default relevance sorting for text search
+        } else {
+           // Default to score if just browsing filters without text
+           url += `&order_by=score&sort=desc`;
+        }
+      }
+
+      const response = await fetch(url);
       
       if (!response.ok) {
         throw new Error('Ошибка при получении данных');
@@ -87,9 +109,10 @@ export default function Search() {
 
   useEffect(() => {
     setPage(1);
+    // Debounce search
     const debounceTimer = setTimeout(() => searchAnime(1), 500);
     return () => clearTimeout(debounceTimer);
-  }, [query]);
+  }, [query, type, status, rating, orderBy, sortDir]);
 
   const loadMore = () => {
     const nextPage = page + 1;
@@ -113,16 +136,69 @@ export default function Search() {
       </div>
 
       <div className={styles.container}>
-        <div className={styles.searchBoxWrapper}>
+        <div className={styles.searchContainer}>
           <div className={styles.searchBox}>
             <FaSearch className={styles.searchIcon} />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Enter anime title..."
+              placeholder="Search anime title, characters, or keywords..."
               className={styles.searchInput}
             />
+          </div>
+
+          <div className={styles.filtersBar}>
+            <div className={styles.filterGroup}>
+              <select value={type} onChange={(e) => setType(e.target.value)} className={styles.filterSelect}>
+                <option value="">All Types</option>
+                <option value="tv">TV</option>
+                <option value="movie">Movie</option>
+                <option value="ova">OVA</option>
+                <option value="special">Special</option>
+                <option value="ona">ONA</option>
+                <option value="music">Music</option>
+              </select>
+            </div>
+
+            <div className={styles.filterGroup}>
+              <select value={status} onChange={(e) => setStatus(e.target.value)} className={styles.filterSelect}>
+                <option value="">All Statuses</option>
+                <option value="airing">Airing</option>
+                <option value="complete">Complete</option>
+                <option value="upcoming">Upcoming</option>
+              </select>
+            </div>
+
+            <div className={styles.filterGroup}>
+              <select value={rating} onChange={(e) => setRating(e.target.value)} className={styles.filterSelect}>
+                <option value="">All Ratings</option>
+                <option value="g">G - All Ages</option>
+                <option value="pg">PG - Children</option>
+                <option value="pg13">PG-13 - Teens 13+</option>
+                <option value="r17">R - 17+ (violence & profanity)</option>
+              </select>
+            </div>
+
+            <div className={styles.filterGroup}>
+              <select value={orderBy} onChange={(e) => setOrderBy(e.target.value)} className={styles.filterSelect}>
+                <option value="">Sort By (Relevance)</option>
+                <option value="score">Score</option>
+                <option value="popularity">Popularity</option>
+                <option value="members">Members</option>
+                <option value="start_date">Start Date</option>
+                <option value="end_date">End Date</option>
+              </select>
+            </div>
+
+            {orderBy && (
+              <div className={styles.filterGroup}>
+                <select value={sortDir} onChange={(e) => setSortDir(e.target.value)} className={styles.filterSelect}>
+                  <option value="desc">Descending</option>
+                  <option value="asc">Ascending</option>
+                </select>
+              </div>
+            )}
           </div>
         </div>
 
