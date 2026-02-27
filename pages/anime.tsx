@@ -99,9 +99,6 @@ const AnimePage: NextPage = () => {
               <FaStar /> {anime.score || '??'}
             </span>
           </div>
-          <button className={CardStyles.watchButton}>
-            <FaPlay /> Watch Now
-          </button>
         </div>
       </div>
       <div className={CardStyles.content}>

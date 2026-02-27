@@ -163,9 +163,6 @@ export default function Search() {
                           </span>
                         )}
                       </div>
-                      <button className={Card.watchButton}>
-                        <FaPlay /> Watch Now
-                      </button>
                     </div>
                   </div>
                   <div className={Card.content}>
