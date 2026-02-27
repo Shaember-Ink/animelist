@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Layout from '../../components/Layout';
@@ -45,42 +46,55 @@ interface Character {
 }
 
 interface CharacterDetailPageProps {
-  character: Character | null;
-  error: string | null;
+  id: string;
 }
 
-export const getServerSideProps: GetServerSideProps<CharacterDetailPageProps> = async ({ params, res }) => {
-  res.setHeader(
-    'Cache-Control',
-    'public, s-maxage=3600, stale-while-revalidate=86400'
-  );
-
+export const getServerSideProps: GetServerSideProps<CharacterDetailPageProps> = async ({ params }) => {
   const id = params?.id;
-
   if (!id || typeof id !== 'string') {
     return { notFound: true };
   }
-
-  try {
-    const characterData = await fetchWithRetry(`https://api.jikan.moe/v4/characters/${id}/full`);
-    return {
-      props: {
-        character: characterData?.data || null,
-        error: null,
-      },
-    };
-  } catch (err) {
-    console.error('Error fetching character detail data in getServerSideProps:', err);
-    return {
-      props: {
-        character: null,
-        error: 'Произошла ошибка при загрузке данных о персонаже.',
-      },
-    };
-  }
+  return {
+    props: { id }
+  };
 };
 
-export default function CharacterDetailPage({ character, error }: CharacterDetailPageProps) {
+export default function CharacterDetailPage({ id }: CharacterDetailPageProps) {
+  const [character, setCharacter] = useState<Character | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchCharacter = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const characterData = await fetchWithRetry(`https://api.jikan.moe/v4/characters/${id}/full`);
+        setCharacter(characterData?.data || null);
+      } catch (err) {
+        console.error('Error fetching character detail data:', err);
+        setError('Произошла ошибка при загрузке данных о персонаже.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCharacter();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className={styles.loadingSection}>
+          <div className={styles.spinner}></div>
+          <p>Загрузка данных о персонаже...</p>
+        </div>
+      </Layout>
+    );
+  }
+
   if (error || !character) {
     return (
       <Layout>

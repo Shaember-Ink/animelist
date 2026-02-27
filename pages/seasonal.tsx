@@ -55,7 +55,6 @@ const SeasonalPage: NextPage = () => {
 
       try {
         const currentData = await fetchWithRetry('https://api.jikan.moe/v4/seasons/now');
-        await delay(1000);
         const nextData = await fetchWithRetry('https://api.jikan.moe/v4/seasons/upcoming');
 
         setCurrentSeason(currentData.data);

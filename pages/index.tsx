@@ -35,9 +35,7 @@ interface HomePageProps {
 export const getStaticProps: GetStaticProps<HomePageProps> = async () => {
   try {
     const trendingData = await fetchWithRetry('https://api.jikan.moe/v4/top/anime');
-    await delay(1000);
     const newData = await fetchWithRetry('https://api.jikan.moe/v4/seasons/now');
-    await delay(1000);
     const upcomingData = await fetchWithRetry('https://api.jikan.moe/v4/seasons/upcoming');
 
     return {

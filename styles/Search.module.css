@@ -36,14 +36,12 @@
   font-weight: 400;
 }
 
-.searchContainer {
+.searchBoxWrapper {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
+  justify-content: center;
   width: 100%;
-  max-width: 800px;
-  margin: -3rem auto 4rem;
+  margin-bottom: 4rem;
+  margin-top: -1.5rem;
   position: relative;
   z-index: 10;
 }
@@ -51,84 +49,40 @@
 .searchBox {
   position: relative;
   width: 100%;
+  max-width: 600px;
 }
 
 .searchIcon {
   position: absolute;
-  left: 1.5rem;
+  left: 1.25rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #aaa;
-  font-size: 1.25rem;
+  color: #666;
+  font-size: 1.2rem;
   pointer-events: none;
-  z-index: 2;
 }
 
 .searchInput {
   width: 100%;
-  padding: 1.25rem 1.5rem 1.25rem 4rem;
-  font-size: 1.15rem;
-  background: rgba(20, 20, 20, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  padding: 1.1rem 1.5rem 1.1rem 3.5rem;
+  font-size: 1.1rem;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
   color: #fff;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .searchInput:focus {
   outline: none;
-  background: rgba(20, 20, 20, 0.8);
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.3), 0 8px 32px rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.9);
+  border-color: #fff;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
 .searchInput::placeholder {
-  color: #777;
-}
-
-.filtersBar {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
-  width: 100%;
-}
-
-.filterGroup {
-  position: relative;
-}
-
-.filterSelect {
-  appearance: none;
-  background: rgba(20, 20, 20, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: #ddd;
-  padding: 0.75rem 2.5rem 0.75rem 1rem;
-  font-size: 0.95rem;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  /* Custom arrow for select */
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23aaaaaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 1em;
-}
-
-.filterSelect:hover, .filterSelect:focus {
-  outline: none;
-  border-color: rgba(255, 255, 255, 0.3);
-  color: #fff;
-}
-
-.filterSelect option {
-  background: #141414;
-  color: #fff;
-  padding: 0.5rem;
+  color: #666;
 }
 
 .grid {
@@ -244,34 +198,9 @@
     font-size: 1rem;
   }
 
-  .searchContainer {
+  .searchBoxWrapper {
     margin-bottom: 2rem;
-    margin-top: -1.5rem;
-    gap: 1rem;
-  }
-
-  .searchInput {
-    padding: 1rem 1rem 1rem 3rem;
-    font-size: 1rem;
-  }
-
-  .searchIcon {
-    left: 1rem;
-    font-size: 1.1rem;
-  }
-
-  .filtersBar {
-    gap: 0.5rem;
-  }
-
-  .filterGroup {
-    width: calc(50% - 0.25rem); /* two columns */
-  }
-
-  .filterSelect {
-    width: 100%;
-    padding: 0.6rem 2rem 0.6rem 0.75rem;
-    font-size: 0.85rem;
+    margin-top: 0;
   }
 
   .grid {

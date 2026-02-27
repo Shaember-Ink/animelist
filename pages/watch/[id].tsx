@@ -121,17 +121,6 @@ export default function WatchAnime({ id }: WatchAnimePageProps) {
     }
   };
 
-  if (loading) {
-    return (
-      <Layout>
-        <div className={styles.loading}>
-          <div className={styles.spinner}></div>
-          <p>Загрузка плеера...</p>
-        </div>
-      </Layout>
-    );
-  }
-
   if (error || !initialAnimeDetails) {
     return (
       <Layout>
@@ -153,41 +142,35 @@ export default function WatchAnime({ id }: WatchAnimePageProps) {
       </Head>
 
       <div className={styles.container}>
-        <div className={styles.theatreSection}>
-          <div className={styles.ambientGlow} />
-          
-          <div className={styles.contentWrapper}>
-            <div className={styles.videoWrapper}>
-              <iframe
-                src={`https://kodik.info/find-player?shikimoriID=${initialAnimeDetails.shikimori_id}`}
-                className={styles.videoPlayer}
-                frameBorder="0"
-                allowFullScreen
-                {...({ webkitallowfullscreen: "true", mozallowfullscreen: "true" } as any)}
-                allow="autoplay; fullscreen"
-                sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
-                title="Anime Player"
-              />
+        <div className={styles.playerSection}>
+          <div className={styles.videoWrapper}>
+            <iframe
+              src={`https://kodik.info/find-player?shikimoriID=${initialAnimeDetails.shikimori_id}&episode=${currentEpisode}`}
+              className={styles.videoPlayer}
+              frameBorder="0"
+              allowFullScreen
+              allow="autoplay *; fullscreen *"
+            />
+          </div>
+
+          <div className={styles.playerInfo}>
+            <div className={styles.episodeInfo}>
+              <h1 className={styles.title}>{initialAnimeDetails.title}</h1>
+              <p className={styles.episodeTitle}>
+                Episode {currentEpisode}
+              </p>
+              <Link href={`/anime/${initialAnimeDetails.id}`} className={styles.backToDetails}>
+                <FaList /> Back to Details
+              </Link>
             </div>
 
-            <div className={styles.infoSection}>
-              <div className={styles.header}>
-                <div className={styles.episodeInfo}>
-                  <h1 className={styles.title}>{initialAnimeDetails.title}</h1>
-                  <Link href={`/anime/${initialAnimeDetails.id}`} className={styles.backToDetails}>
-                    <FaList /> К описанию аниме
-                  </Link>
-                </div>
-
-                <div className={styles.controls}>
-                  <button 
-                    className={`${styles.actionButton} ${shareStatus !== 'default' ? styles.shared : ''}`}
-                    onClick={handleShare}
-                  >
-                    {getShareButtonContent()}
-                  </button>
-                </div>
-              </div>
+            <div className={styles.controls}>
+              <button 
+                className={`${styles.actionButton} ${styles.shareButton} ${shareStatus !== 'default' ? styles.shared : ''}`}
+                onClick={handleShare}
+              >
+                {getShareButtonContent()}
+              </button>
             </div>
           </div>
         </div>

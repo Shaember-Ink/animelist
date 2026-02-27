@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Layout from '../../components/Layout';
@@ -111,19 +111,13 @@ export const getServerSideProps: GetServerSideProps<AnimeDetailPageProps> = asyn
 
   try {
     const animeData = await fetchWithRetry(`https://api.jikan.moe/v4/anime/${id}`);
-    await delay(500);
-    const charactersData = await fetchWithRetry(`https://api.jikan.moe/v4/anime/${id}/characters`);
-    await delay(500);
-    const staffData = await fetchWithRetry(`https://api.jikan.moe/v4/anime/${id}/staff`);
-    await delay(500);
-    const recommendationsData = await fetchWithRetry(`https://api.jikan.moe/v4/anime/${id}/recommendations`);
 
     return {
       props: {
         anime: animeData?.data || null,
-        characters: charactersData?.data || [],
-        staff: staffData?.data || [],
-        recommendations: recommendationsData?.data || [],
+        characters: [],
+        staff: [],
+        recommendations: [],
         error: null,
       },
     };
@@ -141,16 +135,48 @@ export const getServerSideProps: GetServerSideProps<AnimeDetailPageProps> = asyn
   }
 };
 
-export default function AnimeDetailPage({ anime, characters, staff, recommendations, error }: AnimeDetailPageProps) {
+export default function AnimeDetailPage({ anime, error: initialError }: AnimeDetailPageProps) {
+  const [characters, setCharacters] = useState<Character[]>([]);
+  const [staff, setStaff] = useState<Staff[]>([]);
+  const [recommendations, setRecommendations] = useState<AnimeRecommendation[]>([]);
+  const [loadingExtras, setLoadingExtras] = useState(false);
   const [showAllStaff, setShowAllStaff] = useState(false);
   const [showAllCharacters, setShowAllCharacters] = useState(false);
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
 
-  if (error || !anime) {
+  useEffect(() => {
+    if (!anime?.mal_id) return;
+
+    const fetchExtras = async () => {
+      setLoadingExtras(true);
+      try {
+        const id = anime.mal_id;
+        
+        // Fetch secondary data on the client side
+        const [charsRes, staffRes, recsRes] = await Promise.all([
+          fetchWithRetry(`https://api.jikan.moe/v4/anime/${id}/characters`).catch(() => ({ data: [] })),
+          fetchWithRetry(`https://api.jikan.moe/v4/anime/${id}/staff`).catch(() => ({ data: [] })),
+          fetchWithRetry(`https://api.jikan.moe/v4/anime/${id}/recommendations`).catch(() => ({ data: [] }))
+        ]);
+
+        setCharacters(charsRes?.data || []);
+        setStaff(staffRes?.data || []);
+        setRecommendations(recsRes?.data || []);
+      } catch (err) {
+        console.error('Error fetching extra anime data:', err);
+      } finally {
+        setLoadingExtras(false);
+      }
+    };
+
+    fetchExtras();
+  }, [anime?.mal_id]);
+
+  if (initialError || !anime) {
     return (
       <Layout>
         <div className={styles.error}>
-          {error || 'Аниме не найдено'}
+          {initialError || 'Аниме не найдено'}
         </div>
       </Layout>
     );
