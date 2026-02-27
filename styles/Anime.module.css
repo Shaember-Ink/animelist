@@ -106,6 +106,14 @@
   color: #aaa;
   font-size: 0.85rem;
   margin-left: auto;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-weight: 600;
+  transition: color 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .advancedToggle:hover, .advancedToggle.active {
