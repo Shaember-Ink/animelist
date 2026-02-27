@@ -21,7 +21,15 @@ export default function Layout({ children }: LayoutProps) {
   }, []);
 
   const isActive = (path: string) => {
-    return router.pathname === path || (path !== '/' && router.pathname.startsWith(path));
+    if (path === '/') return router.pathname === '/';
+    // Exact match for the path
+    if (router.pathname === path) return true;
+    // Special case for /anime to not match sub-routes that have their own tabs
+    if (path === '/anime' && router.pathname.startsWith('/anime/') && router.pathname !== '/anime') {
+      const subroutes = ['/anime/popular', '/anime/upcoming', '/anime/new'];
+      return !subroutes.includes(router.pathname);
+    }
+    return router.pathname.startsWith(path);
   };
 
   const isHomePage = router.pathname === '/';

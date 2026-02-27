@@ -129,16 +129,8 @@ const PopularAnimePage: NextPage<PopularAnimePageProps> = ({ initialAnime, initi
         <meta name="description" content="Список популярного аниме" />
       </Head>
 
-      <div className={heroStyles.hero}>
-        <div className={heroStyles.heroContent}>
-          <h1 className={heroStyles.heroTitle}>Популярное аниме</h1>
-          <p className={heroStyles.heroSubtitle}>
-            Самые популярные аниме всех времен
-          </p>
-        </div>
-      </div>
-
       <div className={styles.container}>
+        <h1 className={styles.sectionTitle} style={{ marginTop: '20px', marginBottom: '20px' }}>Popular Anime</h1>
         {error && <div className={styles.error}>{error}</div>}
         <div className={styles.grid}>
           {anime.map(renderAnimeCard)}

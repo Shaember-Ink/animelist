@@ -104,13 +104,6 @@ const AnimePage: NextPage<AnimePageProps> = ({ trendingAnime, newAnime, upcoming
       </Head>
 
       <div className={styles.container}>
-        <div className={styles.filtersRow}>
-          <span className={styles.filterLabel}>Sort by:</span>
-          <button className={styles.filterPillActive}>Latest</button>
-          <button className={styles.filterPill}>Year</button>
-          <button className={styles.filterPill}>A-Z</button>
-        </div>
-
         <div className={styles.sections}>
           {trendingAnime.length > 0 && (
             <section className={styles.section}>
