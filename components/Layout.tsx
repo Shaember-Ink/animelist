@@ -1,8 +1,10 @@
 import { ReactNode, useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import Head from "next/head";
 import styles from "../styles/Layout.module.css";
-import { FaSearch, FaTelegram, FaGithub, FaEnvelope } from "react-icons/fa";
+import { FaSearch, FaEnvelope } from "react-icons/fa";
+import Logo from "./Logo";
 
 interface LayoutProps {
   children: ReactNode;
@@ -36,12 +38,15 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className={styles.wrapper}>
+      <Head>
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap" rel="stylesheet" />
+      </Head>
       <header className={`${styles.header} ${scrolled ? styles.headerScrolled : ''} ${!isHomePage ? styles.headerSolid : ''}`}>
         <div className={styles.headerContent}>
           <nav className={styles.nav}>
             <div className={styles.navLeft}>
-              <Link href="/" className={styles.logo}>
-                ANIMELIST
+              <Link href="/" className={styles.logoContainer}>
+                <Logo className={styles.logoSvg} />
               </Link>
               <div className={styles.mainNav}>
                 <Link href="/" className={`${styles.navLink} ${isActive("/") ? styles.active : ""}`}>Home</Link>

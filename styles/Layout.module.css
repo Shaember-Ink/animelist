@@ -49,12 +49,20 @@
   gap: 1.5rem;
 }
 
-.logo {
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: var(--primary);
+.logoContainer {
+  display: flex;
+  align-items: center;
   text-decoration: none;
-  letter-spacing: 1px;
+  transition: transform 0.2s ease;
+}
+
+.logoContainer:hover {
+  transform: scale(1.02);
+}
+
+.logoSvg {
+  max-width: 100%;
+  height: auto;
 }
 
 .mainNav {
@@ -156,7 +164,7 @@
 
 @media (max-width: 768px) {
   .navLeft { gap: 1rem; }
-  .logo { font-size: 1.4rem; }
+  .logoContainer { transform: scale(0.85); transform-origin: left center; }
   .mainNav { display: none; }
   .footerContent { grid-template-columns: repeat(2, 1fr); }
   .footerBottom { text-align: center; }
