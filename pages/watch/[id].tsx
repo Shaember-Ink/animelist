@@ -162,8 +162,11 @@ export default function WatchAnime({ id }: WatchAnimePageProps) {
                 src={`https://kodik.info/find-player?shikimoriID=${initialAnimeDetails.shikimori_id}`}
                 className={styles.videoPlayer}
                 frameBorder="0"
-                allowFullScreen={true}
-                allow="autoplay *; fullscreen *"
+                allowFullScreen
+                {...({ webkitallowfullscreen: "true", mozallowfullscreen: "true" } as any)}
+                allow="autoplay; fullscreen"
+                sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+                title="Anime Player"
               />
             </div>
 
