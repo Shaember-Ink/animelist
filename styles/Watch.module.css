@@ -20,7 +20,6 @@
   width: 100%;
   max-width: 1200px;
   position: relative;
-  z-index: 1;
 }
 
 .ambientGlow {
@@ -40,9 +39,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 16/9;
-  z-index: 1;
   border-radius: 12px;
-  overflow: hidden;
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05),
               0 30px 60px -12px rgba(0, 0, 0, 0.8),
               0 0 100px rgba(229, 9, 20, 0.3); /* Premium red glow */
