@@ -4,135 +4,181 @@
   padding: 0 4% 4rem;
 }
 
-.banner {
-  display: none; /* No longer needed, replaced by generic HeroBanner if we want it */
+.header {
+  padding-top: 8rem;
+  margin-bottom: 3rem;
+  text-align: left;
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 1rem;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #aaa;
+  margin-bottom: 3rem;
+}
+
+.filtersContainer {
+  position: sticky;
+  top: 70px;
+  z-index: 100;
+  background: #141414;
+  padding: 1.5rem 0;
+  margin-bottom: 2rem;
+  margin-left: -4%;
+  margin-right: -4%;
+  padding-left: 4%;
+  padding-right: 4%;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .filtersRow {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-  padding-top: 100px; /* offset for fixed header */
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: none; /* Firefox */
+}
+
+.filtersRow::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
 .filterLabel {
-  color: var(--text-secondary);
+  color: #666;
   font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  margin-right: 1rem;
 }
 
 .filterPill {
-  background-color: transparent;
-  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 0.4rem 1.2rem;
-  border-radius: 20px;
+  padding: 0.6rem 1.5rem;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 500;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .filterPillActive {
-  background-color: var(--primary);
-  color: white;
-  border: 1px solid var(--primary);
-  padding: 0.4rem 1.2rem;
-  border-radius: 20px;
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+  padding: 0.6rem 1.5rem;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 700;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-.filterPill:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+.filterPill:hover:not(.filterPillActive) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 2rem 1rem;
+  gap: 2.5rem 1.5rem;
+  margin-bottom: 4rem;
 }
 
-@media (max-width: 768px) {
-  .grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 1.5rem 0.8rem;
-  }
-}
-
-.sections {
-  display: flex;
-  flex-direction: column;
-  gap: 4rem;
-}
-
-.sectionHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.sectionTitle {
-  font-size: 1.4rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  color: var(--text);
-  margin: 0;
-}
-
-.sectionIcon {
-  color: var(--text);
-}
-
-.viewAll {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.9rem;
-  transition: color 0.2s ease;
-}
-
-.viewAll:hover {
-  color: var(--text);
-}
-
-.error {
+.loadingSection {
   text-align: center;
-  padding: 2rem;
-  color: white;
-  background: var(--primary);
-  border-radius: 4px;
-  margin: 2rem;
-  font-weight: 600;
+  padding: 5rem 0;
+  color: #aaa;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  border-top-color: #e50914;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1.5rem;
 }
 
 .loadMore {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
-  max-width: 250px;
-  margin: 3rem auto 1rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  gap: 0.75rem;
+  margin: 2rem auto;
+  padding: 0.8rem 2.5rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 4px;
-  font-size: 1rem;
+  color: #fff;
   font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.loadMore:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
+.loadMore:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #fff;
+}
+
+.loadMore:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(229, 9, 20, 0.1);
+  border: 1px solid #e50914;
+  border-radius: 4px;
+  color: #fff;
+  margin: 4rem 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding-top: 6.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .title {
+    font-size: 2.2rem;
+  }
+
+  .filtersContainer {
+    top: 60px;
+    padding: 1rem 0;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1.5rem 1rem;
+  }
 }
