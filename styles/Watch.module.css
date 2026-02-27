@@ -29,24 +29,25 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 95%;
-  height: 95%;
-  background: inherit;
+  width: 90%;
+  height: 90%;
+  background: #e50914; /* Explicitly set the theme source color */
   border-radius: 12px;
   z-index: -1;
-  box-shadow: 0 0 80px 20px rgba(229, 9, 20, 0.4), 0 0 120px 40px rgba(229, 9, 20, 0.2);
-  filter: blur(40px);
+  box-shadow: 0 0 100px 40px rgba(229, 9, 20, 0.5), 0 0 150px 80px rgba(229, 9, 20, 0.3);
+  filter: blur(60px);
   animation: pulseGlow 4s ease-in-out infinite alternate;
+  pointer-events: none; /* Ensure it doesn't block player clicks */
 }
 
 @keyframes pulseGlow {
   0% {
-    opacity: 0.6;
-    transform: translate(-50%, -50%) scale(0.98);
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(0.95);
   }
   100% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.02);
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(1.05);
   }
 }
 
