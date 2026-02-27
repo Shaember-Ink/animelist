@@ -1,86 +1,101 @@
 .container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 0 4rem 0;
-  min-height: 100vh;
-  background: #000;
+  padding: 2rem 4%;
 }
 
-.theatreSection {
-  position: relative;
-  width: 100%;
-  padding: 4rem 4% 2rem 4%;
-  background: radial-gradient(circle at 50% 30%, rgba(229, 9, 20, 0.08) 0%, transparent 60%);
+.playerSection {
   display: flex;
   flex-direction: column;
-  align-items: center;
-}
-
-.contentWrapper {
-  width: 100%;
-  max-width: 1200px;
-  position: relative;
-}
-
-.ambientGlow {
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
-  /* Replaced filter: blur with a wide radial gradient that naturally fades */
-  background: radial-gradient(circle at center, rgba(229, 9, 20, 0.12) 0%, rgba(229, 9, 20, 0.05) 30%, transparent 60%);
-  pointer-events: none;
-  z-index: 0;
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
 .videoWrapper {
   position: relative;
-  width: 100%;
-  aspect-ratio: 16/9;
-  border-radius: 12px;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05),
-              0 30px 60px -12px rgba(0, 0, 0, 0.8),
-              0 0 100px rgba(229, 9, 20, 0.3); /* Premium red glow */
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0;
+  border-radius: 8px;
   background: #000;
-  margin-bottom: 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+  margin-bottom: 2.5rem; /* Push text down to make room for the glow */
+}
+
+/* Ambient Glow Effect */
+.videoWrapper::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 95%;
+  height: 95%;
+  background: inherit;
+  border-radius: 12px;
+  z-index: -1;
+  box-shadow: 0 0 80px 20px rgba(229, 9, 20, 0.4), 0 0 120px 40px rgba(229, 9, 20, 0.2);
+  filter: blur(40px);
+  animation: pulseGlow 4s ease-in-out infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.02);
+  }
 }
 
 .videoPlayer {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   border: none;
 }
 
-.infoSection {
-  width: 100%;
+.playerInfo {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
   gap: 2rem;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 1.5rem;
+.episodeInfo {
+  flex: 1;
 }
 
 .title {
-  font-size: 2.5rem;
-  font-weight: 800;
+  font-size: 2rem;
+  font-weight: 700;
   color: #fff;
   margin: 0 0 0.5rem 0;
-  letter-spacing: -0.5px;
+}
+
+.backToDetails {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e50914;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  transition: color 0.2s ease;
+}
+
+.backToDetails:hover {
+  color: #ff0000;
 }
 
 .episodeTitle {
-  font-size: 1.25rem;
-  color: #e50914;
-  font-weight: 600;
+  font-size: 1.1rem;
+  color: #aaa;
   margin: 0;
 }
 
@@ -92,37 +107,30 @@
 .actionButton {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
+  justify-content: center;
   padding: 0.75rem 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
   color: #fff;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
 }
 
 .actionButton:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.4);
-  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
-.backToDetails {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: rgba(255, 255, 255, 0.6);
-  text-decoration: none;
-  font-size: 0.9rem;
-  margin-top: 1rem;
-  transition: color 0.2s ease;
+.shareButton {
+  background: transparent;
 }
 
-.backToDetails:hover {
-  color: #fff;
+.shareButton.shared {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: #22c55e;
 }
 
 .loading {
@@ -130,18 +138,17 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 80vh;
+  min-height: 400px;
   gap: 1.5rem;
-  background: #000;
 }
 
 .spinner {
   width: 50px;
   height: 50px;
-  border: 3px solid rgba(229, 9, 20, 0.1);
+  border: 3px solid rgba(255, 255, 255, 0.1);
   border-top-color: #e50914;
   border-radius: 50%;
-  animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
@@ -153,53 +160,47 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 80vh;
+  min-height: 60vh;
   text-align: center;
   padding: 2rem;
-  background: #000;
 }
 
 .error p {
   font-size: 1.25rem;
   margin-bottom: 2rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: #aaa;
 }
 
 .backButton {
-  padding: 0.8rem 2.5rem;
-  border-radius: 8px;
+  padding: 0.75rem 2rem;
+  border-radius: 4px;
   background: #e50914;
   color: #fff;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease;
 }
 
 .backButton:hover {
-  background: #ff0a16;
-  transform: scale(1.05);
+  background: #bf0812;
 }
 
-@media (max-width: 1000px) {
-  .header {
+@media (max-width: 768px) {
+  .playerInfo {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
+    gap: 1.5rem;
   }
   
   .title {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
   }
   
-  .videoWrapper {
-    max-width: 100%;
+  .controls {
+    width: 100%;
   }
-}
-
-@media (max-width: 600px) {
+  
   .actionButton {
-    padding: 0.6rem 1rem;
-    font-size: 0.85rem;
+    flex: 1;
   }
 }
  
