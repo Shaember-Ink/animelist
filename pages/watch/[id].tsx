@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
+import Link from 'next/link';
 import Layout from '../../components/Layout';
 import styles from '../../styles/Watch.module.css';
 import { FaList, FaBookmark, FaHeart, FaShare, FaCheck, FaCopy } from 'react-icons/fa';
@@ -73,13 +74,9 @@ export default function WatchAnime({ initialAnimeDetails, error }: WatchAnimePag
   const [currentEpisode, setCurrentEpisode] = useState<number>(1);
   const [shareStatus, setShareStatus] = useState<'default' | 'copied' | 'shared'>('default');
 
-  const handleEpisodeSelect = (episodeNumber: number) => {
-    setCurrentEpisode(episodeNumber);
-  };
-
   const handleShare = async () => {
     const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
-    const shareText = `Смотреть ${initialAnimeDetails?.title} - Эпизод ${currentEpisode}`;
+    const shareText = `Watch ${initialAnimeDetails?.title} - Episode ${currentEpisode}`;
 
     try {
       if (typeof navigator !== 'undefined' && navigator.share) {
@@ -104,21 +101,21 @@ export default function WatchAnime({ initialAnimeDetails, error }: WatchAnimePag
         return (
           <>
             <FaCheck />
-            <span>Скопировано!</span>
+            <span>Copied!</span>
           </>
         );
       case 'shared':
         return (
           <>
             <FaCheck />
-            <span>Поделились!</span>
+            <span>Shared!</span>
           </>
         );
       default:
         return (
           <>
             {typeof navigator !== 'undefined' && 'share' in navigator ? <FaShare /> : <FaCopy />}
-            <span>{typeof navigator !== 'undefined' && 'share' in navigator ? 'Поделиться' : 'Копировать ссылку'}</span>
+            <span>Share</span>
           </>
         );
     }
@@ -128,10 +125,10 @@ export default function WatchAnime({ initialAnimeDetails, error }: WatchAnimePag
     return (
       <Layout>
         <div className={styles.error}>
-          <p>{error || 'Аниме не найдено'}</p>
-          <button onClick={() => router.back()} className={styles.backButton}>
-            Вернуться назад
-          </button>
+          <p>{error || 'Anime not found'}</p>
+          <Link href="/anime" className={styles.backButton}>
+            Go Back to Catalog
+          </Link>
         </div>
       </Layout>
     );
@@ -140,8 +137,8 @@ export default function WatchAnime({ initialAnimeDetails, error }: WatchAnimePag
   return (
     <Layout>
       <Head>
-        <title>{initialAnimeDetails.title} - Смотреть онлайн - AnimeList</title>
-        <meta name="description" content={`Смотреть ${initialAnimeDetails.title} онлайн бесплатно`} />
+        <title>{initialAnimeDetails.title} - Watch Online - AnimeList</title>
+        <meta name="description" content={`Watch ${initialAnimeDetails.title} online for free`} />
       </Head>
 
       <div className={styles.container}>
@@ -156,40 +153,25 @@ export default function WatchAnime({ initialAnimeDetails, error }: WatchAnimePag
             />
           </div>
 
-          <div className={styles.controls}>
+          <div className={styles.playerInfo}>
+            <div className={styles.episodeInfo}>
+              <h1 className={styles.title}>{initialAnimeDetails.title}</h1>
+              <p className={styles.episodeTitle}>
+                Episode {currentEpisode}
+              </p>
+              <Link href={`/anime/${initialAnimeDetails.id}`} className={styles.backToDetails}>
+                <FaList /> Back to Details
+              </Link>
+            </div>
 
-            <button 
-              className={`${styles.actionButton} ${styles.shareButton} ${shareStatus !== 'default' ? styles.shared : ''}`}
-              onClick={handleShare}
-            >
-              {getShareButtonContent()}
-            </button>
-          </div>
-
-          <div className={styles.episodeInfo}>
-            <h1 className={styles.title}>{initialAnimeDetails.title}</h1>
-            <p className={styles.episodeTitle}>
-              Эпизод {currentEpisode}
-            </p>
-          </div>
-        </div>
-
-        <div className={styles.episodesList}>
-          <h2 className={styles.episodesTitle}>
-            <FaList /> Список эпизодов
-          </h2>
-          <div className={styles.episodesGrid}>
-            {initialAnimeDetails.episodes.map((episode) => (
-              <button
-                key={episode.number}
-                onClick={() => handleEpisodeSelect(episode.number)}
-                className={`${styles.episodeButton} ${
-                  currentEpisode === episode.number ? styles.active : ''
-                }`}
+            <div className={styles.controls}>
+              <button 
+                className={`${styles.actionButton} ${styles.shareButton} ${shareStatus !== 'default' ? styles.shared : ''}`}
+                onClick={handleShare}
               >
-                <span className={styles.episodeNumber}>{episode.number}</span>
+                {getShareButtonContent()}
               </button>
-            ))}
+            </div>
           </div>
         </div>
       </div>
