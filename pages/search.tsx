@@ -113,15 +113,17 @@ export default function Search() {
       </div>
 
       <div className={styles.container}>
-        <div className={styles.searchBox}>
-          <FaSearch className={styles.searchIcon} />
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Enter anime title..."
-            className={styles.searchInput}
-          />
+        <div className={styles.searchBoxWrapper}>
+          <div className={styles.searchBox}>
+            <FaSearch className={styles.searchIcon} />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Enter anime title..."
+              className={styles.searchInput}
+            />
+          </div>
         </div>
 
         {error && (
@@ -185,7 +187,7 @@ export default function Search() {
                 {loading ? (
                   <>
                     <div className={styles.spinnerSmall}></div>
-                    Loading...
+                    <span>Loading...</span>
                   </>
                 ) : (
                   'Show More'
@@ -202,4 +204,5 @@ export default function Search() {
       </div>
     </Layout>
   );
-} 
+}
+ 

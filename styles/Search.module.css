@@ -1,29 +1,16 @@
 .container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 0 4% 4rem;
 }
 
 .heroSection {
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4));
-  padding: 3rem 1rem;
+  background: linear-gradient(to bottom, #141414 0%, transparent 100%);
+  padding: 6rem 4% 3rem;
   text-align: center;
-  margin-bottom: 2rem;
   position: relative;
-  border-radius: 1rem;
   overflow: hidden;
-  margin: 0 1rem 2rem 1rem;
-}
-
-.heroSection::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, rgba(229, 9, 20, 0.1), rgba(0, 0, 0, 0.5));
-  z-index: 1;
+  margin-bottom: 0;
 }
 
 .heroContent {
@@ -34,208 +21,75 @@
 }
 
 .heroTitle {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 2.5rem;
-  font-weight: 800;
+  font-family: inherit;
+  font-size: 3rem;
+  font-weight: 700;
   color: #fff;
-  margin-bottom: 0.5rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(45deg, #e50914, #ff0000);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.5px;
 }
 
 .heroSubtitle {
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.2rem;
+  color: #aaa;
   margin: 0;
   font-weight: 400;
 }
 
+.searchBoxWrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 4rem;
+  margin-top: -1.5rem;
+  position: relative;
+  z-index: 10;
+}
+
 .searchBox {
   position: relative;
+  width: 100%;
   max-width: 600px;
-  margin: 0 auto;
 }
 
 .searchIcon {
   position: absolute;
-  left: 1.5rem;
+  left: 1.25rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #6b7280;
-  font-size: 1.25rem;
+  color: #666;
+  font-size: 1.2rem;
+  pointer-events: none;
 }
 
 .searchInput {
   width: 100%;
-  padding: 1.25rem 1.5rem 1.25rem 4rem;
+  padding: 1.1rem 1.5rem 1.1rem 3.5rem;
   font-size: 1.1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 4px;
   color: #fff;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .searchInput:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.08);
-  border-color: #e50914;
-  box-shadow: 0 0 10px rgba(229, 9, 20, 0.2);
+  background: rgba(0, 0, 0, 0.9);
+  border-color: #fff;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
 .searchInput::placeholder {
-  color: #6b7280;
+  color: #666;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1rem;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  text-decoration: none;
-  color: inherit;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-}
-
-.imageWrapper {
-  position: relative;
-  width: 100%;
-  padding-top: 140%;
-  overflow: hidden;
-  border-radius: 0.75rem;
-}
-
-.image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.card:hover .image {
-  transform: scale(1.05);
-}
-
-.overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent 50%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 1.5rem;
-}
-
-.card:hover .overlay {
-  opacity: 1;
-}
-
-.stats {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.score,
-.episodes {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 2rem;
-  font-size: 0.9rem;
-}
-
-.score {
-  color: #ffd700;
-}
-
-.episodes {
-  color: #10b981;
-}
-
-.watchButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0.75rem;
-  background: #e50914;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.watchButton:hover {
-  background: #bf0812;
-}
-
-.content {
-  padding: 1.5rem;
-}
-
-.title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0;
-  color: #fff;
-  line-height: 1.4;
-}
-
-.japaneseTitle {
-  font-size: 0.9rem;
-  color: #6b7280;
-  margin: 0.5rem 0;
-}
-
-.genres {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 0.75rem 0;
-}
-
-.genre {
-  padding: 0.25rem 0.75rem;
-  background: rgba(229, 9, 20, 0.1);
-  border: 1px solid rgba(229, 9, 20, 0.2);
-  border-radius: 4px;
-  font-size: 0.8rem;
-  color: #fff;
-}
-
-.synopsis {
-  font-size: 0.9rem;
-  color: #9ca3af;
-  margin: 0.75rem 0 0;
-  line-height: 1.6;
+  gap: 2.5rem 1.5rem;
+  margin-bottom: 3rem;
 }
 
 .loadMore {
@@ -244,19 +98,20 @@
   justify-content: center;
   gap: 0.75rem;
   margin: 2rem auto;
-  padding: 0.75rem 2rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 0.5rem;
+  padding: 0.8rem 2.5rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
   color: white;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .loadMore:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #fff;
 }
 
 .loadMore:disabled {
@@ -266,66 +121,73 @@
 
 .spinner,
 .spinnerSmall {
-  border: 3px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 50%;
   border-top-color: #e50914;
   animation: spin 1s linear infinite;
 }
 
 .spinner {
-  width: 48px;
-  height: 48px;
-  margin: 0 auto 1rem;
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 1.5rem;
 }
 
 .spinnerSmall {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 .loading {
   text-align: center;
-  padding: 3rem;
-  color: #6b7280;
+  padding: 5rem 1rem;
+  color: #aaa;
+}
+
+.loading p {
+  font-size: 1.1rem;
 }
 
 .error {
   text-align: center;
-  padding: 1.5rem;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 0.5rem;
-  color: #fca5a5;
+  padding: 2rem;
+  background: rgba(229, 9, 20, 0.1);
+  border: 1px solid #e50914;
+  border-radius: 4px;
+  color: #fff;
   margin-bottom: 2rem;
 }
 
 .noResults {
   text-align: center;
-  padding: 3rem;
-  color: #6b7280;
+  padding: 5rem 1rem;
+  color: #aaa;
 }
 
 .noResults p:first-child {
-  font-size: 1.25rem;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 1rem;
 }
 
 .noResults p:last-child {
-  font-size: 0.95rem;
-  opacity: 0.8;
+  font-size: 1rem;
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   }
 }
 
 @media (max-width: 768px) {
   .heroSection {
-    padding: 2rem 1rem;
-    margin: 0 0.5rem 1.5rem 0.5rem;
+    padding: 4rem 4% 2rem;
   }
 
   .heroTitle {
@@ -336,26 +198,14 @@
     font-size: 1rem;
   }
 
-  .searchInput {
-    font-size: 1rem;
-    padding: 1rem 1.25rem 1rem 3.5rem;
-  }
-
-  .searchIcon {
-    left: 1.25rem;
-    font-size: 1.1rem;
+  .searchBoxWrapper {
+    margin-bottom: 2rem;
+    margin-top: 0;
   }
 
   .grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1.5rem 1rem;
   }
-
-  .title {
-    font-size: 1.1rem;
-  }
-
-  .synopsis {
-    font-size: 0.85rem;
-  }
-} 
+}
+ 
